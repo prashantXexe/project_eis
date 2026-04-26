@@ -3,16 +3,12 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
-
 export default function Home() {
   const nav = useNavigate();
 
   const [recentImages, setRecentImages] = useState([]);
   const [selectedImg, setSelectedImg] = useState(null);
   const [logs, setLogs] = useState([]);
-  const [alertMsg, setAlertMsg] = useState("");
-  const [alerts, setAlerts] = useState([]);
-const [selectedAlert, setSelectedAlert] = useState(null);
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
@@ -49,85 +45,9 @@ const [selectedAlert, setSelectedAlert] = useState(null);
 
     return () => unsubscribe();
   }, []);
-  useEffect(() => {
-  const q = query(
-    collection(db, "alerts"),
-    orderBy("timestamp", "desc")
-  );
 
-  const unsub = onSnapshot(q, (snap) => {
-    const data = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    setAlerts(data.slice(0, 5));
-  });
-
-  return () => unsub();
-}, []);
   return (
     <>
-    <div style={{
-  position: "fixed",
-  bottom: "20px",
-  right: "20px",
-  display: "flex",
-  flexDirection: "column",
-  gap: "10px",
-  zIndex: 9999
-}}>
-  {alerts.map((a) => (
-    <div key={a.id} style={{
-      background: "#111827",
-      color: "white",
-      padding: "12px",
-      borderRadius: "8px",
-      width: "250px",
-      border: "1px solid #ef4444"
-    }}>
-      <div style={{ fontWeight: "bold", color: "#ef4444" }}>
-        🚨 {a.type.toUpperCase()}
-      </div>
-
-      <div style={{ fontSize: "12px", marginTop: "5px" }}>
-        Track ID: {a.track_id}
-      </div>
-
-      <div style={{ marginTop: "8px", display: "flex", gap: "6px" }}>
-        
-        <button
-          onClick={() => setAlerts(alerts.filter(x => x.id !== a.id))}
-          style={{
-            flex: 1,
-            background: "#374151",
-            border: "none",
-            color: "white",
-            padding: "5px",
-            borderRadius: "4px"
-          }}
-        >
-          Ignore
-        </button>
-
-        <button
-          onClick={() => setSelectedAlert(a)}
-          style={{
-            flex: 1,
-            background: "#ef4444",
-            border: "none",
-            color: "white",
-            padding: "5px",
-            borderRadius: "4px"
-          }}
-        >
-          Details
-        </button>
-
-      </div>
-    </div>
-  ))}
-</div>
       <div
         style={{
           height: "100%",
@@ -243,61 +163,7 @@ const [selectedAlert, setSelectedAlert] = useState(null);
           <h3>Analytics</h3>
         </div>
       </div>
-        {selectedAlert && (
-  <div
-    onClick={() => setSelectedAlert(null)}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.7)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 9999
-    }}
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        background: "#111827",
-        padding: "20px",
-        borderRadius: "10px",
-        width: "400px",
-        color: "white"
-      }}
-    >
-      <h3>🚨 Alert Details</h3>
 
-      <p><b>Type:</b> {selectedAlert.type}</p>
-      <p><b>Track ID:</b> {selectedAlert.track_id}</p>
-      <p><b>Zone:</b> {selectedAlert.zone_id}</p>
-
-      {selectedAlert.dwell_time && (
-        <p><b>Dwell:</b> {selectedAlert.dwell_time}s</p>
-      )}
-
-      <img
-        src={recentImages[0]}
-        style={{ width: "100%", borderRadius: "8px" }}
-      />
-
-      <button
-        onClick={() => setSelectedAlert(null)}
-        style={{
-          marginTop: "10px",
-          width: "100%",
-          padding: "8px",
-          background: "#ef4444",
-          border: "none",
-          color: "white",
-          borderRadius: "6px"
-        }}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
       {/* 🔥 IMAGE MODAL */}
       {selectedImg && (
         <div className="modal" onClick={() => setSelectedImg(null)}>
