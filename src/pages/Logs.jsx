@@ -81,7 +81,7 @@ export default function Logs() {
                   <td>
                     <button
                       className="viewBtn"
-                      onClick={() => window.open(log.imageUrl, "_blank")}
+                      onClick={() => window.open(`${log.imageUrl}?t=${Date.now()}`)}
                     >
                       View
                     </button>

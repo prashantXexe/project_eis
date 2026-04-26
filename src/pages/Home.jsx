@@ -112,7 +112,7 @@ export default function Home() {
             {recentImages.map((img, i) => (
               <img
                 key={i}
-                src={img}
+                src={`${img}?t=${Date.now()}`}
                 alt=""
                 onClick={(e) => {
                   e.stopPropagation();

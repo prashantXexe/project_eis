@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { db, storage } from "../firebase";
+import { deleteDoc, doc } from "firebase/firestore";
 import {
   collection,
   onSnapshot,
@@ -27,27 +28,36 @@ export default function Storage() {
 
   // 🔥 REALTIME IMAGES FROM FIRESTORE
   useEffect(() => {
-    const q = query(
-      collection(db, "detections"),
-      orderBy("timestamp", "desc")
-    );
+  const q = query(
+    collection(db, "detections"),
+    orderBy("timestamp", "desc")
+  );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => {
-        const d = doc.data();
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      const d = change.doc.data();
 
-        return {
-          id: doc.id,
-          url: d.image_url,
-          path: d.path
-        };
-      });
+      if (change.type === "added") {
+        setImages((prev) => [
+          {
+            id: change.doc.id,
+            url: d.image_url,
+            path: d.path
+          },
+          ...prev
+        ]);
+      }
 
-      setImages(data);
+      if (change.type === "removed") {
+        setImages((prev) =>
+          prev.filter((img) => img.id !== change.doc.id)
+        );
+      }
     });
+  });
 
-    return () => unsubscribe();
-  }, []);
+  return () => unsubscribe();
+}, []);
 
   // ⬇️ DOWNLOAD
   const handleDownload = async (path) => {
@@ -72,17 +82,22 @@ export default function Storage() {
   };
 
   // ❌ DELETE
-  const handleDelete = async (path) => {
-    try {
-      const fileRef = ref(storage, path);
-      await deleteObject(fileRef);
+const handleDelete = async () => {
+  try {
+    const fileRef = ref(storage, selectedImg.path);
 
-      setSelectedImg(null);
-      showToast("Image Deleted 🗑️");
-    } catch {
-      showToast("Delete Failed ❌");
-    }
-  };
+    // 🔥 storage delete
+    await deleteObject(fileRef);
+
+    // 🔥 firestore delete (IMPORTANT)
+    await deleteDoc(doc(db, "detections", selectedImg.id));
+
+    setSelectedImg(null);
+    showToast("Image Deleted 🗑️");
+  } catch {
+    showToast("Delete Failed ❌");
+  }
+};
 
   return (
     <div style={{ padding: 20 }}>
@@ -93,7 +108,7 @@ export default function Storage() {
         {images.map((img) => (
           <div className="imageCard" key={img.id}>
             <img
-              src={img.url}
+              src={`${img.url}?t=${Date.now()}`}
               alt=""
               onClick={() => setSelectedImg(img)}
             />
@@ -108,16 +123,16 @@ export default function Storage() {
             className="modalContent"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={selectedImg.url} className="modalImg" />
+            <img src={`${selectedImg.url}?t=${Date.now()}`} className="modalImg" />
 
             <div className="modalActions">
               <button onClick={() => handleDownload(selectedImg.path)}>
-                Download
-              </button>
+  Download
+</button>
 
               {user.role === "admin" && (
                 <button
-                  onClick={() => handleDelete(selectedImg.path)}
+                  onClick={handleDelete}
                   className="deleteBtn"
                 >
                   Delete
