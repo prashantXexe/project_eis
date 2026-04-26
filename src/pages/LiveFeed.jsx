@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://leslie-newsletter-inter-epa.trycloudflare.com/video";
+    "https://vinyl-routine-distant-june.trycloudflare.com";
 
   return (
     <div

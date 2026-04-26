@@ -12,7 +12,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "https://leslie-newsletter-inter-epa.trycloudflare.com/video";
+    "https://vinyl-routine-distant-june.trycloudflare.com";
 
   // 🔥 REALTIME DATA
   useEffect(() => {
