@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://vinyl-routine-distant-june.trycloudflare.com/video";
+    "http://10.51.16.148:8889/live/";
 
   return (
     <div

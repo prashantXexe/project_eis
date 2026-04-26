@@ -12,7 +12,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "https://vinyl-routine-distant-june.trycloudflare.com/video";
+    "http://10.51.16.148:8889/live/";
 
   // 🔥 REALTIME DATA
   useEffect(() => {
