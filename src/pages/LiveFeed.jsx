@@ -30,7 +30,7 @@ export default function LivePage() {
       {/* 🔥 VIDEO */}
       <div
         style={{
-          width: "800px",
+          width: "700px",
           maxWidth: "90%",
           aspectRatio: "4 / 3",
           borderRadius: "12px",

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import {
@@ -30,15 +31,15 @@ export default function Navbar() {
     : "US";
 
   // 🔥 Logout
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.clear(); // 🔥 better cleanup
-      window.location.href = "/login";
-    } catch (err) {
-      console.log("Logout error:", err);
-    }
-  };
+ const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    localStorage.clear();
+    nav("/");   // 🔥 FIX (React routing)
+  } catch (err) {
+    console.log("Logout error:", err);
+  }
+};
 
   return (
     <div
