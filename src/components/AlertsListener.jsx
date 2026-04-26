@@ -4,34 +4,36 @@ import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
 export default function AlertsListener() {
   const [alert, setAlert] = useState(null);
-  const [lastId, setLastId] = useState(null);
 
   useEffect(() => {
+    console.log("🔥 Alerts listener running...");
+
     const q = query(
       collection(db, "alerts"),
       orderBy("timestamp", "desc")
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const latest = snapshot.docs[0];
-      if (!latest) return;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const newAlert = {
+            id: change.doc.id,
+            ...change.doc.data()
+          };
 
-      if (latest.id === lastId) return;
+          console.log("🚨 NEW ALERT:", newAlert);
 
-      setLastId(latest.id);
-
-      setAlert({
-        id: latest.id,
-        ...latest.data()
+          setAlert(newAlert); // 🔥 popup trigger
+        }
       });
     });
 
     return () => unsubscribe();
-  }, [lastId]);
+  }, []);
 
+  // 🔥 IMPORTANT RETURN
   return alert ? <AlertPopup alert={alert} /> : null;
 }
-
 // 🔴 POPUP UI
 function AlertPopup({ alert }) {
   const [show, setShow] = useState(true);
@@ -40,15 +42,17 @@ function AlertPopup({ alert }) {
 
   return (
     <div style={{
-      position: "fixed",
-      top: "20px",
-      right: "20px",
-      background: "#111827",
-      color: "white",
-      padding: "15px",
-      borderRadius: "10px",
-      zIndex: 9999
-    }}>
+  position: "fixed",
+  top: "20px",
+  right: "20px",   // 👉 SIDE (right corner)
+  zIndex: 9999,    // 👉 sabke upar
+  background: "#111827",
+  color: "white",
+  padding: "15px",
+  borderRadius: "10px",
+  width: "260px",
+  boxShadow: "0 0 12px rgba(0,0,0,0.6)"
+}}>
       <div style={{ fontWeight: "bold" }}>
         🚨 Alert Generated
       </div>
