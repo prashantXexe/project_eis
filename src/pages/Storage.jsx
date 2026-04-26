@@ -54,31 +54,19 @@ export default function Storage() {
   }, []);
 
   // ⬇️ DOWNLOAD
-const handleDownload = async (url) => {
+  const handleDownload = (url) => {
   try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-
-    const blobUrl = window.URL.createObjectURL(blob);
-
     const a = document.createElement("a");
-    a.href = blobUrl;
-
-    // 🔥 dynamic filename
-    const fileName = url.split("/").pop().split("?")[0];
-    a.download = fileName || "image.jpg";
-
+    a.href = url;
+    a.download = "image.jpg"; // ya dynamic naam
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 
-    window.URL.revokeObjectURL(blobUrl);
-
-    showToast("Image Downloaded ✅");
-
+    showToast("Image Downloaded ");
   } catch (err) {
     console.log(err);
-    showToast("Download Failed ❌");
+    showToast("Download Failed ");
   }
 };
 
@@ -87,14 +75,14 @@ const handleDownload = async (url) => {
   try {
     let path = selectedImg.path;
 
-    // 🔥 URL se path extract
+    // 🔥 extract from new URL format
     if (!path && selectedImg.url) {
-      const decoded = decodeURIComponent(selectedImg.url);
+      const url = selectedImg.url;
 
-      const match = decoded.match(/\/o\/(.*?)\?/);
+      const match = url.match(/\/detections\/(.+)$/);
 
       if (match && match[1]) {
-        path = match[1]; // detections/filename.jpg
+        path = "detections/" + match[1];
       }
     }
 
