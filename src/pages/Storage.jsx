@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
 import { db, storage } from "../firebase";
-import { deleteDoc, doc } from "firebase/firestore";
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy
-} from "firebase/firestore";
-import {
-  ref,
-  deleteObject,
-  getBlob
-} from "firebase/storage";
+import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { ref, deleteObject, getBlob } from "firebase/storage";
 
 export default function Storage() {
   const [images, setImages] = useState([]);
@@ -28,36 +18,40 @@ export default function Storage() {
 
   // 🔥 REALTIME IMAGES FROM FIRESTORE
   useEffect(() => {
-  const q = query(
-    collection(db, "detections"),
-    orderBy("timestamp", "desc")
-  );
+    const q = query(
+      collection(db, "detections"),
+      orderBy("timestamp", "desc")
+    );
 
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-      const d = change.doc.data();
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const d = change.doc.data();
 
-      if (change.type === "added") {
-        setImages((prev) => [
-          {
-            id: change.doc.id,
-            url: d.image_url,
-            path: d.path
-          },
-          ...prev
-        ]);
-      }
+        if (change.type === "added") {
+          setImages((prev) => {
+            if (prev.find((p) => p.id === change.doc.id)) return prev;
 
-      if (change.type === "removed") {
-        setImages((prev) =>
-          prev.filter((img) => img.id !== change.doc.id)
-        );
-      }
+            return [
+              {
+                id: change.doc.id,
+                url: d.image_url,
+                path: d.path
+              },
+              ...prev
+            ];
+          });
+        }
+
+        if (change.type === "removed") {
+          setImages((prev) =>
+            prev.filter((img) => img.id !== change.doc.id)
+          );
+        }
+      });
     });
-  });
 
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
   // ⬇️ DOWNLOAD
   const handleDownload = async (path) => {
@@ -82,39 +76,47 @@ export default function Storage() {
   };
 
   // ❌ DELETE
-const handleDelete = async () => {
-  try {
-    const fileRef = ref(storage, selectedImg.path);
+  const handleDelete = async () => {
+    try {
+      const fileRef = ref(storage, selectedImg.path);
 
-    // 🔥 storage delete
-    await deleteObject(fileRef);
+      await deleteObject(fileRef);
+      await deleteDoc(doc(db, "detections", selectedImg.id));
 
-    // 🔥 firestore delete (IMPORTANT)
-    await deleteDoc(doc(db, "detections", selectedImg.id));
-
-    setSelectedImg(null);
-    showToast("Image Deleted 🗑️");
-  } catch {
-    showToast("Delete Failed ❌");
-  }
-};
+      setSelectedImg(null);
+      showToast("Image Deleted 🗑️");
+    } catch {
+      showToast("Delete Failed ❌");
+    }
+  };
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Storage</h2>
 
       {/* 🔲 GRID */}
-      <div className="gridContainer">
-        {images.map((img) => (
-          <div className="imageCard" key={img.id}>
-            <img
-              src={`${img.url}?t=${Date.now()}`}
-              alt=""
-              onClick={() => setSelectedImg(img)}
-            />
-          </div>
-        ))}
-      </div>
+      {images.filter(img => img.url).length === 0 ? (
+        <div style={{ color: "#9ca3af", marginTop: "20px" }}>
+          No images found 📭
+        </div>
+      ) : (
+        <div className="gridContainer">
+          {images
+            .filter(img => img.url)
+            .map((img) => (
+              <div className="imageCard" key={img.id}>
+                <img
+                  src={`${img.url}?t=${Date.now()}`}
+                  alt=""
+                  onClick={() => setSelectedImg(img)}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+              </div>
+            ))}
+        </div>
+      )}
 
       {/* 🔥 MODAL */}
       {selectedImg && (
@@ -123,12 +125,18 @@ const handleDelete = async () => {
             className="modalContent"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={`${selectedImg.url}?t=${Date.now()}`} className="modalImg" />
+            <img
+              src={`${selectedImg.url}?t=${Date.now()}`}
+              className="modalImg"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
 
             <div className="modalActions">
               <button onClick={() => handleDownload(selectedImg.path)}>
-  Download
-</button>
+                Download
+              </button>
 
               {user.role === "admin" && (
                 <button
