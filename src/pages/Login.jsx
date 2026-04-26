@@ -4,8 +4,6 @@ import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "../index.css";
 
-import Particles from "@tsparticles/react";
-import { loadFull } from "tsparticles";
 
 export default function Login() {
   const [username, setUsername] = useState("");
