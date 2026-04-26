@@ -54,31 +54,56 @@ export default function Storage() {
   }, []);
 
   // ⬇️ DOWNLOAD
-  const handleDownload = (url) => {
+const handleDownload = async (url) => {
   try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "image.jpg"; // ya dynamic naam
+    a.href = blobUrl;
+
+    // 🔥 dynamic filename
+    const fileName = url.split("/").pop().split("?")[0];
+    a.download = fileName || "image.jpg";
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 
-    showToast("Image Downloaded ");
+    window.URL.revokeObjectURL(blobUrl);
+
+    showToast("Image Downloaded ✅");
+
   } catch (err) {
     console.log(err);
-    showToast("Download Failed ");
+    showToast("Download Failed ❌");
   }
 };
 
   // ❌ DELETE
   const handleDelete = async () => {
   try {
-    if (!selectedImg?.path) {
-      showToast("Path missing ❌");
+    let path = selectedImg.path;
+
+    // 🔥 URL se path extract
+    if (!path && selectedImg.url) {
+      const decoded = decodeURIComponent(selectedImg.url);
+
+      const match = decoded.match(/\/o\/(.*?)\?/);
+
+      if (match && match[1]) {
+        path = match[1]; // detections/filename.jpg
+      }
+    }
+
+    if (!path) {
+      showToast("Path extract nahi hua ❌");
       return;
     }
 
-    const fileRef = ref(storage, selectedImg.path);
+    const fileRef = ref(storage, path);
 
     await deleteObject(fileRef);
     await deleteDoc(doc(db, "detections", selectedImg.id));
