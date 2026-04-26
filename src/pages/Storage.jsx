@@ -54,41 +54,43 @@ export default function Storage() {
   }, []);
 
   // ⬇️ DOWNLOAD
-  const handleDownload = async (path) => {
-    try {
-      const fileRef = ref(storage, path);
-      const blob = await getBlob(fileRef);
+  const handleDownload = (url) => {
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "image.jpg"; // ya dynamic naam
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-      const fileName = path.split("/").pop();
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = fileName;
-      a.click();
-
-      window.URL.revokeObjectURL(blobUrl);
-
-      showToast("Image Downloaded ✅");
-    } catch {
-      showToast("Download Failed ❌");
-    }
-  };
+    showToast("Image Downloaded ");
+  } catch (err) {
+    console.log(err);
+    showToast("Download Failed ");
+  }
+};
 
   // ❌ DELETE
   const handleDelete = async () => {
-    try {
-      const fileRef = ref(storage, selectedImg.path);
-
-      await deleteObject(fileRef);
-      await deleteDoc(doc(db, "detections", selectedImg.id));
-
-      setSelectedImg(null);
-      showToast("Image Deleted 🗑️");
-    } catch {
-      showToast("Delete Failed ❌");
+  try {
+    if (!selectedImg?.path) {
+      showToast("Path missing ❌");
+      return;
     }
-  };
+
+    const fileRef = ref(storage, selectedImg.path);
+
+    await deleteObject(fileRef);
+    await deleteDoc(doc(db, "detections", selectedImg.id));
+
+    setSelectedImg(null);
+    showToast("Image Deleted 🗑️");
+
+  } catch (err) {
+    console.log("DELETE ERROR:", err);
+    showToast("Delete Failed ❌");
+  }
+};
 
   return (
     <div style={{ padding: 20 }}>
@@ -134,7 +136,7 @@ export default function Storage() {
             />
 
             <div className="modalActions">
-              <button onClick={() => handleDownload(selectedImg.path)}>
+              <button onClick={() => handleDownload(selectedImg.url)}>
                 Download
               </button>
 
