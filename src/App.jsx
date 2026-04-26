@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
+
 import Navbar from "./components/Navbar";
+import AlertsListener from "./components/AlertsListener";
 
 import Home from "./pages/Home";
 import Storage from "./pages/Storage";
@@ -39,11 +41,15 @@ function Layout() {
         overflow: "hidden"
       }}
     >
-      {/* 🔥 NAVBAR ONLY WHEN LOGGED IN */}
+      {/* 🔥 NAVBAR + ALERT LISTENER */}
       {user && (
-        <Navbar user={{ name: user.email, role: "admin" }} />
+        <>
+          <Navbar user={{ name: user.email, role: "admin" }} />
+          <AlertsListener /> {/* ✅ correct JSX comment */}
+        </>
       )}
 
+      {/* 🔲 MAIN CONTENT */}
       <div
         style={{
           flex: 1,
