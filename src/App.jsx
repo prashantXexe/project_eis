@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
-
+import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
