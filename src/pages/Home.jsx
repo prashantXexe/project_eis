@@ -10,9 +10,8 @@ export default function Home() {
   const [selectedImg, setSelectedImg] = useState(null);
   const [logs, setLogs] = useState([]);
 
-  // 🔥 STREAM URL (fallback added)
+  // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    import.meta.env.VITE_STREAM_URL ||
     "https://leslie-newsletter-inter-epa.trycloudflare.com/video";
 
   // 🔥 REALTIME DATA
@@ -62,49 +61,47 @@ export default function Home() {
       >
         {/* 🎥 Live Feed */}
         <div className="card" onClick={() => nav("/live")}>
-          {/* <h3>Live Feed</h3> */}
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "500px",
+              aspectRatio: "4 / 3",
+              background: "#000",
+              borderRadius: "10px",
+              overflow: "hidden",
+              margin: "0 auto",
+              position: "relative",
+            }}
+          >
+            {/* 🔥 OVERLAY */}
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                right: "12px",
+                color: "#22c55e",
+                fontWeight: "600",
+                fontSize: "13px",
+                background: "rgba(0,0,0,0.5)",
+                padding: "5px 10px",
+                borderRadius: "6px",
+                textShadow: "0 0 6px rgba(34,197,94,0.7)",
+              }}
+            >
+              🔴 Cam 1
+            </div>
 
-         <div
-  style={{
-    width: "100%",
-    maxWidth: "500px",
-    aspectRatio: "4 / 3",
-    background: "#000",
-    borderRadius: "10px",
-    overflow: "hidden",
-    margin: "0 auto",
-    position: "relative"   // 🔥 IMPORTANT
-  }}
->
-  {/* 🔥 OVERLAY TEXT */}
-  <div
-  style={{
-    position: "absolute",
-    top: "12px",
-    right: "12px",   // 🔥 LEFT → RIGHT change
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: "14px",
-    background: "rgba(0,0,0,0.6)",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    letterSpacing: "0.5px"
-  }}
->
-  Cam 1 Live Feed
-</div>
-
-  {/* 🔥 VIDEO */}
-  <img
-    src={STREAM_URL}
-    alt="Live"
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "contain"
-    }}
-  />
-</div>
+            {/* 🔥 VIDEO */}
+            <img
+              src={STREAM_URL}
+              alt="Live"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </div>
         </div>
 
         {/* 🖼️ Recent Photos */}

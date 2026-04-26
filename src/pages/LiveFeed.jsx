@@ -1,6 +1,6 @@
 export default function LivePage() {
+  // 🔥 DIRECT URL (NO ENV)
   const url =
-    import.meta.env.VITE_STREAM_URL ||
     "https://leslie-newsletter-inter-epa.trycloudflare.com/video";
 
   return (
@@ -8,32 +8,35 @@ export default function LivePage() {
       style={{
         height: "100vh",
         display: "flex",
-        flexDirection: "column",   // 🔥 important
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        gap: "15px"
+        gap: "15px",
+        background: "#020617"   // 🔥 dark bg (pro look)
       }}
     >
       {/* 🔥 TITLE */}
       <h2
         style={{
-          color: "#fff",
+          color: "#22c55e",
           fontWeight: "600",
-          letterSpacing: "1px"
+          letterSpacing: "1px",
+          textShadow: "0 0 10px rgba(34,197,94,0.6)"
         }}
       >
-        Cam 1
+        🔴 Cam 1 Live Feed
       </h2>
 
       {/* 🔥 VIDEO */}
       <div
         style={{
           width: "800px",
+          maxWidth: "90%",
           aspectRatio: "4 / 3",
           borderRadius: "12px",
           overflow: "hidden",
           background: "#000",
-          boxShadow: "0 0 20px rgba(0,0,0,0.6)"
+          boxShadow: "0 0 25px rgba(0,0,0,0.7)"
         }}
       >
         <img
