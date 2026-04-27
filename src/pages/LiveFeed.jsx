@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "http://10.51.16.148:8889/live/";
+    "https://projected-blackberry-sells-pink.trycloudflare.com";
 
   return (
     <div

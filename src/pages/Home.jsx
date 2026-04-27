@@ -93,7 +93,7 @@ export default function Home() {
 
             {/* 🔥 VIDEO */}
             <img
-              src={STREAM_URL}
+              src={"https://projected-blackberry-sells-pink.trycloudflare.com"}
               alt="Live"
               style={{
                 width: "100%",
