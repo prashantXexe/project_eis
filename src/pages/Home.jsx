@@ -12,7 +12,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "";
+    "https://integrating-dryer-lime-compilation.trycloudflare.com/video";
 
   // 🔥 REALTIME DATA
   useEffect(() => {
