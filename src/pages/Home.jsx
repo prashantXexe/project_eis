@@ -60,7 +60,14 @@ export default function Home() {
         }}
       >
         {/* 🎥 Live Feed */}
-        <div className="card" onClick={() => nav("/live")}>
+        <div
+  className="card"
+  onClick={(e) => {
+    if (e.target.tagName !== "IMG") {
+      nav("/live");
+    }
+  }}
+>
           <div
             style={{
               width: "100%",
@@ -92,15 +99,15 @@ export default function Home() {
             </div>
 
             {/* 🔥 VIDEO */}
-            <img
-              src={STREAM_URL}
-              alt="Live"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
+           <img
+  src={STREAM_URL}
+  alt="Live"
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  }}
+/>
           </div>
         </div>
 
