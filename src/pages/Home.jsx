@@ -12,7 +12,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "http://10.51.16.148:8889/live/";
+    "";
 
   // 🔥 REALTIME DATA
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function Home() {
 
             {/* 🔥 VIDEO */}
             <img
-              src={"https://projected-blackberry-sells-pink.trycloudflare.com"}
+              src={STREAM_URL}
               alt="Live"
               style={{
                 width: "100%",

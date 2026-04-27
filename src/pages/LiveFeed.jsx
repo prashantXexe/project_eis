@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://projected-blackberry-sells-pink.trycloudflare.com";
+    "https://integrating-dryer-lime-compilation.trycloudflare.com/video";
 
   return (
     <div
