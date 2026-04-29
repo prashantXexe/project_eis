@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 import Navbar from "./components/Navbar";
 import AlertsListener from "./components/AlertsListener";
@@ -6,25 +9,45 @@ import AlertsListener from "./components/AlertsListener";
 import Home from "./pages/Home";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
-import Insights from "./pages/Insights";
+import Analytics from "./pages/Analytics";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
-import Alerts from "./pages/Alerts";
+import Login from "./pages/Login";
 
 function Layout() {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
-  return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      
-      {/* 🔥 ALWAYS SHOW NAVBAR (ADMIN MODE) */}
-      <>
-        <Navbar user={{ name: "Admin", role: "admin" }} />
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-        {/* Alerts popup */}
-        {location.pathname !== "/alerts" && <AlertsListener />}
-      </>
+  // 🔥 AUTH LISTENER
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  if (loading) return null;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        overflow: "hidden"
+      }}
+    >
+      {/* 🔥 NAVBAR + ALERT LISTENER */}
+      {user && (
+        <>
+          <Navbar user={{ name: user.email, role: "admin" }} />
+          <AlertsListener /> {/* ✅ correct JSX comment */}
+        </>
+      )}
 
       {/* 🔲 MAIN CONTENT */}
       <div
@@ -36,16 +59,22 @@ function Layout() {
         }}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/storage" element={<Storage />} />
-          <Route path="/logs" element={<Logs />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/live" element={<LiveFeed />} />
-
-          {/* 🔓 ADMIN ACCESS (NO LOGIN) */}
-          <Route path="/users" element={<Users />} />
-
-          <Route path="/alerts" element={<Alerts />} />
+          {!user ? (
+            <>
+              {/* 🔐 NOT LOGGED IN */}
+              <Route path="*" element={<Login />} />
+            </>
+          ) : (
+            <>
+              {/* 🔓 LOGGED IN */}
+              <Route path="/" element={<Home />} />
+              <Route path="/storage" element={<Storage />} />
+              <Route path="/logs" element={<Logs />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/live" element={<LiveFeed />} />
+              <Route path="/users" element={<Users />} />
+            </>
+          )}
         </Routes>
       </div>
     </div>
