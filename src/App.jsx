@@ -9,7 +9,7 @@ import AlertsListener from "./components/AlertsListener";
 import Home from "./pages/Home";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
-import Analytics from "./pages/Analytics";
+import Insights from "./pages/Insights";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
@@ -71,7 +71,7 @@ function Layout() {
               <Route path="/" element={<Home />} />
               <Route path="/storage" element={<Storage />} />
               <Route path="/logs" element={<Logs />} />
-              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/insights" element={<Insights />} />
               <Route path="/live" element={<LiveFeed />} />
               <Route path="/users" element={<Users />} />
               <Route path="/alerts" element={<Alerts />} />

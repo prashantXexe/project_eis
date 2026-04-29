@@ -91,9 +91,9 @@ export default function Navbar() {
           <FileText size={18} /> Logs
         </Link>
 
-        <Link to="/analytics" className="navItem">
-          <BarChart3 size={18} /> Analytics
-        </Link>
+        <Link to="/insights" className="navItem">
+  <BarChart3 size={18} /> Insights
+</Link>
 
         <Link to="/live" className="navItem">
           <Video size={18} /> Live Feed
