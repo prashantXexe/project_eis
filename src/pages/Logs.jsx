@@ -11,6 +11,7 @@ export default function Logs() {
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
+    if (!auth.currentUser) return;
     const q = query(
       collection(db, "detections"),
       orderBy("timestamp", "desc") // 🔥 latest first

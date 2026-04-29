@@ -18,6 +18,7 @@ export default function Storage() {
 
   // 🔥 REALTIME IMAGES FROM FIRESTORE
   useEffect(() => {
+    if (!auth.currentUser) return;
     const q = query(
       collection(db, "detections"),
       orderBy("timestamp", "desc")

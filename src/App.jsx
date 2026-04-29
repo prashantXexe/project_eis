@@ -24,8 +24,9 @@ function Layout() {
   const [role, setRole] = useState("admin"); // 🔥 default admin
   const [loading, setLoading] = useState(true);
 useEffect(() => {
-  const autoLogin = async () => {
+  const initAuth = async () => {
     try {
+      // 🔥 पहले login करो
       await signInWithEmailAndPassword(
         auth,
         "admin.projecteis@gmail.com",
@@ -36,29 +37,28 @@ useEffect(() => {
     }
   };
 
-  autoLogin();
-}, []);
-  // 🔥 AUTH LISTENER (optional but kept)
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
+  initAuth();
 
-      if (u) {
-        try {
-          const q = await getDoc(doc(db, "users", u.uid));
-          if (q.exists()) {
-            setRole(q.data().role);
-          }
-        } catch (err) {
-          console.log("Role fetch error:", err);
-        }
+  // 🔥 फिर auth state सुनो
+  const unsub = onAuthStateChanged(auth, async (u) => {
+    if (!u) return;
+
+    setUser(u);
+
+    try {
+      const snap = await getDoc(doc(db, "users", u.uid));
+      if (snap.exists()) {
+        setRole(snap.data().role);
       }
+    } catch (err) {
+      console.log("Role fetch error:", err);
+    }
 
-      setLoading(false);
-    });
+    setLoading(false);
+  });
 
-    return () => unsub();
-  }, []);
+  return () => unsub();
+}, []);
 
   if (loading) return <div style={{ color: "white" }}>Loading...</div>;
 
