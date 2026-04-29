@@ -53,7 +53,6 @@ export default function Insights() {
 
       setStats({ total, intrusion, dwell, loitering });
 
-      // 🔥 UPDATED (Total added)
       setChartData([
         { name: "Total", value: total, color: "#3b82f6" },
         { name: "Intrusion", value: intrusion, color: "#ef4444" },
@@ -82,9 +81,9 @@ export default function Insights() {
         }}
       >
         <StatBox title="Total Alerts" value={stats.total} color="#3b82f6" />
-        <StatBox title="Intrusion" value={stats.intrusion} color="#ef4444" />
-        <StatBox title="Dwell" value={stats.dwell} color="#f59e0b" />
-        <StatBox title="Loitering" value={stats.loitering} color="#10b981" />
+        <StatBox title="Intrusion Alerts" value={stats.intrusion} color="#ef4444" />
+        <StatBox title="Dwell Events" value={stats.dwell} color="#f59e0b" />
+        <StatBox title="Loitering Events" value={stats.loitering} color="#10b981" />
       </div>
 
       {/* 🔥 GRAPH */}
@@ -100,7 +99,7 @@ export default function Insights() {
         }}
       >
         <ResponsiveContainer>
-          <BarChart data={chartData} barSize={50}>
+          <BarChart data={chartData} barSize={40}>
             
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
 
@@ -110,7 +109,12 @@ export default function Insights() {
               stroke="#9ca3af"
               tick={{ fill: "#9ca3af" }}
             >
-              <Label value="Alert Type" offset={-5} position="insideBottom" fill="#9ca3af" />
+              <Label
+                value="Alert Category"
+                position="insideBottom"
+                offset={-5}
+                fill="#9ca3af"
+              />
             </XAxis>
 
             {/* 🔥 Y AXIS */}
@@ -119,7 +123,7 @@ export default function Insights() {
               tick={{ fill: "#9ca3af" }}
             >
               <Label
-                value="Count"
+                value="Number of Alerts (Last 24h)"
                 angle={-90}
                 position="insideLeft"
                 fill="#9ca3af"
@@ -128,17 +132,22 @@ export default function Insights() {
 
             {/* 🔥 TOOLTIP */}
             <Tooltip
-              formatter={(value) => [`${value}`, "Count"]}
+              cursor={{ fill: "transparent" }}   // ❌ removes white hover
+              formatter={(value) => [`${value}`, "Alerts"]}
               contentStyle={{
                 background: "#111827",
-                border: "none",
+                border: "1px solid #1f2937",
                 borderRadius: "8px",
                 color: "white"
               }}
             />
 
             {/* 🔥 BARS */}
-            <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+            <Bar
+              dataKey="value"
+              radius={[10, 10, 0, 0]}
+              activeBar={false}   // ❌ removes white highlight
+            >
               {chartData.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
               ))}
