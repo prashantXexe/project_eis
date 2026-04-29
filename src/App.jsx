@@ -31,7 +31,7 @@ function Layout() {
     return () => unsub();
   }, []);
 
-  if (loading) return null;
+  if (loading) return <div style={{ color: "white" }}>Loading...</div>;
 
   return (
     <div

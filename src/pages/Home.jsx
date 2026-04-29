@@ -9,9 +9,6 @@ export default function Home() {
   const [recentImages, setRecentImages] = useState([]);
   const [selectedImg, setSelectedImg] = useState(null);
   const [logs, setLogs] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-const [activeAlert, setActiveAlert] = useState(null);
-const [lastAlertId, setLastAlertId] = useState(null);
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
@@ -138,34 +135,42 @@ const [lastAlertId, setLastAlertId] = useState(null);
           <h3 className="cardTitle">Recent Logs</h3>
 
           <div className="recentLogs">
-            <table>
-              <thead>
-                <tr>
-                  <th>Track</th>
-                  <th>Score</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
+  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <thead>
+      <tr style={{ borderBottom: "1px solid #1f2937" }}>
+        <th>Track</th>
+        <th>Score</th>
+        <th>Date</th>
+        <th>Time</th>
+      </tr>
+    </thead>
 
-              <tbody>
-                {logs.slice(0, 5).map((log) => (
-                  <tr key={log.id}>
-                    <td>{log.trackId}</td>
-                    <td
-                      style={{
-                        color: log.score >= 7 ? "#22c55e" : "#f59e0b",
-                      }}
-                    >
-                      {log.score}
-                    </td>
-                    <td>{log.dateStr}</td>
-                    <td>{log.timeStr}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+    <tbody>
+      {logs.slice(0, 5).map((log) => (
+        <tr
+          key={log.id}
+          style={{
+            borderBottom: "1px solid #1f2937",
+          }}
+        >
+          <td>{log.trackId}</td>
+
+          <td
+            style={{
+              color: log.score >= 7 ? "#22c55e" : "#f59e0b",
+              fontWeight: "bold",
+            }}
+          >
+            {log.score}
+          </td>
+
+          <td>{log.dateStr}</td>
+          <td>{log.timeStr}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
         </div>
 
         {/* 📊 Analytics */}
