@@ -16,10 +16,14 @@ export default function AlertsListener() {
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
-          newAlerts.push({
-            id: change.doc.id,
-            ...change.doc.data()
-          });
+         const newAlert = {
+        id: change.doc.id,
+        ...change.doc.data()
+      };
+
+      console.log("🚨 NEW ALERT:", newAlert); // 🔥 MAIN DEBUG
+
+      newAlerts.push(newAlert);
         }
       });
 
