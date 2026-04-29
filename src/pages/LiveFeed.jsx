@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://api-idaho-jvc-mention.trycloudflare.com/video";
+    "https://speaking-mothers-basename-experienced.trycloudflare.com/video";
 
   return (
     <div

@@ -14,7 +14,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "https://api-idaho-jvc-mention.trycloudflare.com/video";
+    "https://speaking-mothers-basename-experienced.trycloudflare.com/video";
 
   // 🔥 REALTIME DATA (DETECTIONS)
   useEffect(() => {
