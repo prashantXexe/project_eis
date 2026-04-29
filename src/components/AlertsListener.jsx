@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function AlertsListener() {
   const [alerts, setAlerts] = useState([]);
@@ -48,12 +49,10 @@ export default function AlertsListener() {
 
           // ⏱ remove after 10 sec
           setTimeout(() => {
-            setAlerts((prev) =>
-              prev.filter((a) => a.id !== id)
-            );
-
-            processedIds.current.delete(id); // cleanup
-          }, 10000);
+  setAlerts((prev) =>
+    prev.filter((a) => a.id !== id)
+  );
+}, 30000);
         }
       });
     });
@@ -82,6 +81,8 @@ export default function AlertsListener() {
 
 // 🔴 ALERT CARD
 function AlertCard({ alert }) {
+  const nav = useNavigate(); // 👈 inside function
+
   return (
     <div
       style={{
@@ -105,6 +106,24 @@ function AlertCard({ alert }) {
       <div style={{ fontSize: "12px", color: "#9ca3af" }}>
         Zone: {alert.zone_id}
       </div>
+
+      {/* 🔥 DETAILS BUTTON ADD KAR */}
+      <button
+        onClick={() => nav("/alerts")}
+        style={{
+          marginTop: "10px",
+          width: "100%",
+          background: "#111827",
+          border: "1px solid #1f2937",
+          padding: "6px",
+          borderRadius: "6px",
+          color: "white",
+          cursor: "pointer",
+          fontSize: "12px",
+        }}
+      >
+        Details
+      </button>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 import {
   Home,
@@ -15,15 +15,19 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
+  const nav = useNavigate();
 
-  const nav = useNavigate(); // ✅ FIX
-
-  // 🔔 ALERT COUNT
+  // 🔔 ALERT COUNT (LAST 24 HOURS)
   const [alertCount, setAlertCount] = useState(0);
 
-  // 🔥 REALTIME ALERT COUNT
   useEffect(() => {
-    const q = query(collection(db, "alerts"));
+    const now = new Date();
+    const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const q = query(
+      collection(db, "alerts"),
+      where("timestamp", ">=", last24)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setAlertCount(snapshot.size);
@@ -32,12 +36,12 @@ export default function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  // ✅ SAFE DATA
+  // 👤 USER DATA
   const username = localStorage.getItem("username") || "user";
   const name = localStorage.getItem("name") || username || "User";
   const role = localStorage.getItem("role");
 
-  // ✅ INITIALS
+  // 🔤 INITIALS
   const initials = name
     ? name
         .trim()
@@ -48,7 +52,7 @@ export default function Navbar() {
         .toUpperCase()
     : "US";
 
-  // 🔥 LOGOUT
+  // 🔴 LOGOUT
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -95,7 +99,7 @@ export default function Navbar() {
           <Video size={18} /> Live Feed
         </Link>
 
-        {/* 🔔 ALERTS WITH BADGE */}
+        {/* 🔔 ALERTS */}
         <Link to="/alerts" className="navItem" style={{ position: "relative" }}>
           <Bell size={18} /> Alerts
 
@@ -112,7 +116,7 @@ export default function Navbar() {
                 borderRadius: "999px",
               }}
             >
-              {alertCount}
+              {alertCount > 99 ? "99+" : alertCount}
             </span>
           )}
         </Link>
@@ -135,7 +139,7 @@ export default function Navbar() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 
-          {/* 🔵 Avatar */}
+          {/* 🔵 AVATAR */}
           <div
             style={{
               width: "40px",
@@ -152,7 +156,7 @@ export default function Navbar() {
           >
             {initials}
 
-            {/* 🟢 ONLINE */}
+            {/* 🟢 ONLINE DOT */}
             <div
               style={{
                 position: "absolute",
@@ -166,7 +170,7 @@ export default function Navbar() {
             />
           </div>
 
-          {/* 🧑 INFO */}
+          {/* 👤 USER INFO */}
           <div>
             <div style={{ fontSize: "14px", color: "white" }}>
               {name}

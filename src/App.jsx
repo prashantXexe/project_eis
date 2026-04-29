@@ -13,6 +13,7 @@ import Analytics from "./pages/Analytics";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
+import Alerts from "./pages/Alerts";
 
 function Layout() {
   const location = useLocation();
@@ -73,6 +74,7 @@ function Layout() {
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/live" element={<LiveFeed />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/alerts" element={<Alerts />} />
             </>
           )}
         </Routes>
