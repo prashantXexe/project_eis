@@ -4,7 +4,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  onSnapshot
+  onSnapshot,
+  updateDoc
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -12,6 +13,7 @@ export default function Users() {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState("");
+  const [editUser, setEditUser] = useState(null); // 🔥 NEW
 
   const [form, setForm] = useState({
     name: "",
@@ -38,14 +40,13 @@ export default function Users() {
   const handleAddUser = async () => {
     if (!form.email || !form.username || !form.password) {
       setToast("Invalid entry ❌");
-      setTimeout(() => setToast(""), 3000);
       return;
     }
 
     try {
       await addDoc(collection(db, "users"), form);
 
-      setToast(`${form.role === "admin" ? "Admin" : "User"} created ✅`);
+      setToast("User created ✅");
 
       setShowModal(false);
       setForm({
@@ -55,8 +56,34 @@ export default function Users() {
         password: "",
         role: "user"
       });
-    } catch {
-      setToast("Something went wrong ❌");
+    } catch (err) {
+      console.log(err);
+      setToast("Create failed ❌");
+    }
+
+    setTimeout(() => setToast(""), 3000);
+  };
+
+  // 🔥 UPDATE USER
+  const handleUpdateUser = async () => {
+    try {
+      const ref = doc(db, "users", editUser.id);
+
+      await updateDoc(ref, {
+        name: form.name,
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        role: form.role
+      });
+
+      setToast("User updated ✅");
+      setShowModal(false);
+      setEditUser(null);
+
+    } catch (err) {
+      console.log(err);
+      setToast("Update failed ❌");
     }
 
     setTimeout(() => setToast(""), 3000);
@@ -66,9 +93,9 @@ export default function Users() {
   const handleDelete = async (user) => {
     try {
       await deleteDoc(doc(db, "users", user.id));
-
-      setToast(`${user.role === "admin" ? "Admin" : "User"} deleted ❌`);
-    } catch {
+      setToast("User deleted ❌");
+    } catch (err) {
+      console.log(err);
       setToast("Delete failed ❌");
     }
 
@@ -78,116 +105,121 @@ export default function Users() {
   return (
     <div style={{ padding: "20px" }}>
 
-      {/* 🔥 HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "16px"
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Admin Panel</h2>
+      {/* HEADER */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginBottom: "16px"
+      }}>
+        <h2>Admin Panel</h2>
 
         <button
           className="createBtn"
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setEditUser(null);
+            setForm({
+              name: "",
+              username: "",
+              email: "",
+              password: "",
+              role: "user"
+            });
+            setShowModal(true);
+          }}
         >
           + Create User
         </button>
       </div>
 
-      {/* 🔥 TABLE */}
-      <div className="logWrapper">
-        <table className="logTable">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Edit</th>
-              <th>Delete</th>
+      {/* TABLE */}
+      <table className="logTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.map(u => (
+            <tr key={u.id}>
+              <td>{u.name}</td>
+              <td>{u.username}</td>
+              <td>{u.role}</td>
+
+              {/* 🔥 EDIT */}
+              <td>
+                <button
+                  className="viewBtn"
+                  onClick={() => {
+                    setEditUser(u);
+                    setForm(u);
+                    setShowModal(true);
+                  }}
+                >
+                  Edit
+                </button>
+              </td>
+
+              {/* 🔥 DELETE */}
+              <td>
+                <button
+                  className="deleteBtn"
+                  onClick={() => handleDelete(u)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
 
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.username}</td>
-                <td>{u.role}</td>
-
-                <td>
-                  <button className="viewBtn">Edit</button>
-                </td>
-
-                <td>
-                  <button
-                    className="deleteBtn"
-                    onClick={() => handleDelete(u)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 🔥 MODAL */}
+      {/* MODAL */}
       {showModal && (
         <div className="modal">
           <div className="modalContent">
 
-            <h3>Create User</h3>
+            <h3>{editUser ? "Edit User" : "Create User"}</h3>
 
             <input
               placeholder="Name"
               value={form.name}
-              onChange={e =>
-                setForm({ ...form, name: e.target.value })
-              }
+              onChange={e => setForm({ ...form, name: e.target.value })}
             />
 
             <input
               placeholder="Username"
               value={form.username}
-              onChange={e =>
-                setForm({ ...form, username: e.target.value })
-              }
+              onChange={e => setForm({ ...form, username: e.target.value })}
             />
 
             <input
               placeholder="Email"
               value={form.email}
-              onChange={e =>
-                setForm({ ...form, email: e.target.value })
-              }
+              onChange={e => setForm({ ...form, email: e.target.value })}
             />
 
             <input
               placeholder="Password"
-              type="password"
               value={form.password}
-              onChange={e =>
-                setForm({ ...form, password: e.target.value })
-              }
+              onChange={e => setForm({ ...form, password: e.target.value })}
             />
 
             <select
               value={form.role}
-              onChange={e =>
-                setForm({ ...form, role: e.target.value })
-              }
+              onChange={e => setForm({ ...form, role: e.target.value })}
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
 
             <div className="modalActions">
-              <button onClick={handleAddUser}>
-                Create
+              <button onClick={editUser ? handleUpdateUser : handleAddUser}>
+                {editUser ? "Update" : "Create"}
               </button>
 
               <button onClick={() => setShowModal(false)}>
@@ -199,7 +231,7 @@ export default function Users() {
         </div>
       )}
 
-      {/* 🔥 TOAST */}
+      {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
