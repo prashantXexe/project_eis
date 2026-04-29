@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 import Navbar from "./components/Navbar";
 import AlertsListener from "./components/AlertsListener";
@@ -21,23 +21,37 @@ function Layout() {
   const isHome = location.pathname === "/";
 
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // 🔥 role state
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 AUTH LISTENER
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
 
       if (u) {
         try {
-          // 🔥 get role from Firestore
-          const q = await getDoc(doc(db, "users", u.uid));
-          if (q.exists()) {
-            setRole(q.data().role);
+          // 🔥 FIX: fetch by uid
+          const q = query(
+            collection(db, "users"),
+            where("uid", "==", u.uid)
+          );
+
+          const snap = await getDocs(q);
+
+          if (!snap.empty) {
+            const data = snap.docs[0].data();
+
+            // 🔥 disabled check
+            if (data.disabled) {
+              alert("User disabled ❌");
+              auth.signOut();
+              return;
+            }
+
+            setRole(data.role);
           }
         } catch (err) {
-          console.log("Role fetch error:", err);
+          console.log(err);
         }
       }
 
@@ -50,37 +64,18 @@ function Layout() {
   if (loading) return <div style={{ color: "white" }}>Loading...</div>;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden"
-      }}
-    >
-      {/* 🔥 NAVBAR + ALERT LISTENER */}
+    <div style={{ display: "flex", height: "100vh" }}>
       {user && (
         <>
           <Navbar user={{ name: user.email, role }} />
-
-          {/* ❌ Alerts page pe popup band */}
           {location.pathname !== "/alerts" && <AlertsListener />}
         </>
       )}
 
-      {/* 🔲 MAIN CONTENT */}
-      <div
-        style={{
-          flex: 1,
-          height: "100vh",
-          overflowY: isHome ? "hidden" : "auto",
-          background: "#0b1220"
-        }}
-      >
+      <div style={{ flex: 1, background: "#0b1220" }}>
         <Routes>
           {!user ? (
-            <>
-              <Route path="*" element={<Login />} />
-            </>
+            <Route path="*" element={<Login />} />
           ) : (
             <>
               <Route path="/" element={<Home />} />

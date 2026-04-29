@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import {
   collection,
   addDoc,
-  deleteDoc,
   doc,
   onSnapshot,
-  updateDoc
+  updateDoc,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
@@ -37,7 +39,7 @@ export default function Users() {
     return () => unsubscribe();
   }, []);
 
-  // 🔥 CREATE USER (AUTH + FIRESTORE)
+  // 🔥 CREATE USER
   const handleAddUser = async () => {
     if (!form.email || !form.password) {
       setToast("Invalid entry ❌");
@@ -45,20 +47,35 @@ export default function Users() {
     }
 
     try {
-      // ✅ STEP 1: CREATE IN AUTH
+      // ✅ USERNAME DUPLICATE CHECK
+      const q = query(
+        collection(db, "users"),
+        where("username", "==", form.username.toLowerCase())
+      );
+
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        setToast("Username exists ❌");
+        return;
+      }
+
+      // ✅ CREATE IN AUTH
       const userCred = await createUserWithEmailAndPassword(
         auth,
         form.email,
         form.password
       );
 
-      // ✅ STEP 2: SAVE IN FIRESTORE
+      // ✅ SAVE IN FIRESTORE
       await addDoc(collection(db, "users"), {
         uid: userCred.user.uid,
         name: form.name,
         username: form.username.toLowerCase(),
         email: form.email,
-        role: form.role
+        role: form.role,
+        disabled: false,
+        createdAt: new Date()
       });
 
       setToast("User created ✅");
@@ -88,8 +105,8 @@ export default function Users() {
       await updateDoc(ref, {
         name: form.name,
         username: form.username.toLowerCase(),
-        email: form.email,
         role: form.role
+        // ❌ email update removed (important)
       });
 
       setToast("User updated ✅");
@@ -104,14 +121,19 @@ export default function Users() {
     setTimeout(() => setToast(""), 3000);
   };
 
-  // 🔥 DELETE USER (Firestore only)
+  // 🔥 DISABLE USER (instead of delete)
   const handleDelete = async (user) => {
+    if (!window.confirm("Disable user?")) return;
+
     try {
-      await deleteDoc(doc(db, "users", user.id));
-      setToast("User deleted ❌");
+      await updateDoc(doc(db, "users", user.id), {
+        disabled: true
+      });
+
+      setToast("User disabled ❌");
     } catch (err) {
       console.log(err);
-      setToast("Delete failed ❌");
+      setToast("Disable failed ❌");
     }
 
     setTimeout(() => setToast(""), 3000);
@@ -119,7 +141,6 @@ export default function Users() {
 
   return (
     <div style={{ padding: "20px" }}>
-
       {/* HEADER */}
       <div style={{
         display: "flex",
@@ -153,8 +174,9 @@ export default function Users() {
             <th>Name</th>
             <th>Username</th>
             <th>Role</th>
+            <th>Status</th>
             <th>Edit</th>
-            <th>Delete</th>
+            <th>Disable</th>
           </tr>
         </thead>
 
@@ -164,6 +186,10 @@ export default function Users() {
               <td>{u.name}</td>
               <td>{u.username}</td>
               <td>{u.role}</td>
+
+              <td style={{ color: u.disabled ? "red" : "green" }}>
+                {u.disabled ? "Disabled" : "Active"}
+              </td>
 
               <td>
                 <button
@@ -183,7 +209,7 @@ export default function Users() {
                   className="deleteBtn"
                   onClick={() => handleDelete(u)}
                 >
-                  Delete
+                  Disable
                 </button>
               </td>
             </tr>
@@ -213,6 +239,7 @@ export default function Users() {
             <input
               placeholder="Email"
               value={form.email}
+              disabled={editUser} // 🔥 IMPORTANT
               onChange={e => setForm({ ...form, email: e.target.value })}
             />
 
