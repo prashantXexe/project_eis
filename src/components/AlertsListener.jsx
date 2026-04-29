@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
 export default function AlertsListener() {
   const [alerts, setAlerts] = useState([]);
+  const processedIds = useRef(new Set()); // 🔥 important
 
   useEffect(() => {
     const q = query(
@@ -14,7 +15,7 @@ export default function AlertsListener() {
     let initialized = false;
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // ❌ ignore old alerts on first load
+      // ❌ ignore old alerts
       if (!initialized) {
         initialized = true;
         console.log("⏭️ Ignored old alerts");
@@ -23,29 +24,36 @@ export default function AlertsListener() {
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
+          const id = change.doc.id;
+
+          // ❌ duplicate block (GLOBAL)
+          if (processedIds.current.has(id)) {
+            return;
+          }
+
+          processedIds.current.add(id); // mark as processed
+
           const newAlert = {
-            id: change.doc.id,
+            id,
             ...change.doc.data()
           };
 
           console.log("🚨 NEW ALERT:", newAlert);
 
+          // 🔴 add alert
           setAlerts((prev) => {
-            // ❌ duplicate block BEFORE adding
-            if (prev.some((a) => a.id === newAlert.id)) {
-              return prev;
-            }
-
-            // ⏱ timer only once (inside same block)
-            setTimeout(() => {
-              setAlerts((curr) =>
-                curr.filter((a) => a.id !== newAlert.id)
-              );
-            }, 10000);
-
             const updated = [newAlert, ...prev];
-            return updated.slice(0, 5); // max 5 alerts
+            return updated.slice(0, 5);
           });
+
+          // ⏱ remove after 10 sec
+          setTimeout(() => {
+            setAlerts((prev) =>
+              prev.filter((a) => a.id !== id)
+            );
+
+            processedIds.current.delete(id); // cleanup
+          }, 10000);
         }
       });
     });
@@ -96,23 +104,6 @@ function AlertCard({ alert }) {
 
       <div style={{ fontSize: "12px", color: "#9ca3af" }}>
         Zone: {alert.zone_id}
-      </div>
-
-      <div style={{ marginTop: "8px" }}>
-        <button
-          onClick={() => console.log("Details:", alert)}
-          style={{
-            fontSize: "12px",
-            padding: "4px 8px",
-            background: "#111827",
-            border: "1px solid #1f2937",
-            borderRadius: "5px",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Details
-        </button>
       </div>
     </div>
   );
