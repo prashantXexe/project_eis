@@ -206,7 +206,7 @@ export default function Home() {
         </div>
 
         {/* 📊 Analytics */}
-        <div className="card" onClick={() => nav("/analytics")}>
+        <div className="card" onClick={() => nav("/insights")}>
           <h3 className="cardTitle">Analytics</h3>
 
           <div style={{ height: "180px" }}>
