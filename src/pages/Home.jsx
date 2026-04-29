@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
-import InsightsChart from "../components/InsightsChart"; // 🔥 NEW
+import InsightsChart from "../pages/InsightsChart";
 
 export default function Home() {
   const nav = useNavigate();

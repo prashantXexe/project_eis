@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-import InsightsChart from "../components/InsightsChart";
-
+import InsightsChart from "./InsightsChart";
 export default function Insights() {
   const [stats, setStats] = useState({
     total: 0,
