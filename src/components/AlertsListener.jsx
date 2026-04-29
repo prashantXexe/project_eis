@@ -14,7 +14,7 @@ export default function AlertsListener() {
     let initialized = false;
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // 🔥 first load ignore (old alerts)
+      // ❌ ignore old alerts on first load
       if (!initialized) {
         initialized = true;
         console.log("⏭️ Ignored old alerts");
@@ -30,18 +30,22 @@ export default function AlertsListener() {
 
           console.log("🚨 NEW ALERT:", newAlert);
 
-          // 🔴 add alert (top pe)
           setAlerts((prev) => {
-            const updated = [newAlert, ...prev];
-            return updated.slice(0, 5); // max 5
-          });
+            // ❌ duplicate block BEFORE adding
+            if (prev.some((a) => a.id === newAlert.id)) {
+              return prev;
+            }
 
-          // ⏱ individual timer (10 sec per alert)
-          setTimeout(() => {
-            setAlerts((prev) =>
-              prev.filter((a) => a.id !== newAlert.id)
-            );
-          }, 10000);
+            // ⏱ timer only once (inside same block)
+            setTimeout(() => {
+              setAlerts((curr) =>
+                curr.filter((a) => a.id !== newAlert.id)
+              );
+            }, 10000);
+
+            const updated = [newAlert, ...prev];
+            return updated.slice(0, 5); // max 5 alerts
+          });
         }
       });
     });
