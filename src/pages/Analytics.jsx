@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, query } from "firebase/firestore";
+export default function Analytics() {
+  return <h1 style={{ color: "white" }}>🔥 ANALYTICS NEW PAGE</h1>;
+}
 console.log("🔥 Analytics Page Loaded");
 import {
   BarChart,
