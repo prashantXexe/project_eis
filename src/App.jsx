@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { auth, db } from "./firebase";
+import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { signInWithEmailAndPassword } from "firebase/auth";
 
 import Navbar from "./components/Navbar";
 import AlertsListener from "./components/AlertsListener";
@@ -14,6 +12,7 @@ import Logs from "./pages/Logs";
 import Insights from "./pages/Insights";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
+import Login from "./pages/Login";
 import Alerts from "./pages/Alerts";
 
 function Layout() {
@@ -21,44 +20,17 @@ function Layout() {
   const isHome = location.pathname === "/";
 
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState("admin"); // 🔥 default admin
   const [loading, setLoading] = useState(true);
-useEffect(() => {
-  const initAuth = async () => {
-    try {
-      // 🔥 पहले login करो
-      await signInWithEmailAndPassword(
-        auth,
-        "admin.projecteis@gmail.com",
-        "Admin@EIS"
-      );
-    } catch (err) {
-      console.log("Auto login failed:", err);
-    }
-  };
 
-  initAuth();
+  // 🔥 AUTH LISTENER
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
 
-  // 🔥 फिर auth state सुनो
-  const unsub = onAuthStateChanged(auth, async (u) => {
-    if (!u) return;
-
-    setUser(u);
-
-    try {
-      const snap = await getDoc(doc(db, "users", u.uid));
-      if (snap.exists()) {
-        setRole(snap.data().role);
-      }
-    } catch (err) {
-      console.log("Role fetch error:", err);
-    }
-
-    setLoading(false);
-  });
-
-  return () => unsub();
-}, []);
+    return () => unsub();
+  }, []);
 
   if (loading) return <div style={{ color: "white" }}>Loading...</div>;
 
@@ -70,12 +42,13 @@ useEffect(() => {
         overflow: "hidden"
       }}
     >
-      {/* 🔥 ALWAYS SHOW NAVBAR */}
-      <>
-        <Navbar user={{ name: user?.email || "Admin", role }} />
-
-        {location.pathname !== "/alerts" && <AlertsListener />}
-      </>
+      {/* 🔥 NAVBAR + ALERT LISTENER */}
+      {user && (
+        <>
+          <Navbar user={{ name: user.email, role: "admin" }} />
+          <AlertsListener /> {/* ✅ correct JSX comment */}
+        </>
+      )}
 
       {/* 🔲 MAIN CONTENT */}
       <div
@@ -87,19 +60,23 @@ useEffect(() => {
         }}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/storage" element={<Storage />} />
-          <Route path="/logs" element={<Logs />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/live" element={<LiveFeed />} />
-
-          {/* 🔐 ADMIN ONLY */}
-          <Route
-            path="/users"
-            element={role === "admin" ? <Users /> : <Home />}
-          />
-
-          <Route path="/alerts" element={<Alerts />} />
+          {!user ? (
+            <>
+              {/* 🔐 NOT LOGGED IN */}
+              <Route path="*" element={<Login />} />
+            </>
+          ) : (
+            <>
+              {/* 🔓 LOGGED IN */}
+              <Route path="/" element={<Home />} />
+              <Route path="/storage" element={<Storage />} />
+              <Route path="/logs" element={<Logs />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/live" element={<LiveFeed />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/alerts" element={<Alerts />} />
+            </>
+          )}
         </Routes>
       </div>
     </div>

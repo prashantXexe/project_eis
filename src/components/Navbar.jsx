@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { useEffect, useState } from "react";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+
 import {
   Home,
   Database,
@@ -13,13 +15,33 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
+  const nav = useNavigate();
 
-  // ✅ SAFE DATA
+  // 🔔 ALERT COUNT (LAST 24 HOURS)
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    const now = new Date();
+    const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const q = query(
+      collection(db, "alerts"),
+      where("timestamp", ">=", last24)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setAlertCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 👤 USER DATA
   const username = localStorage.getItem("username") || "user";
   const name = localStorage.getItem("name") || username || "User";
   const role = localStorage.getItem("role");
 
-  // ✅ SAFE INITIALS (PB type)
+  // 🔤 INITIALS
   const initials = name
     ? name
         .trim()
@@ -30,16 +52,16 @@ export default function Navbar() {
         .toUpperCase()
     : "US";
 
-  // 🔥 Logout
- const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    localStorage.clear();
-    nav("/");   // 🔥 FIX (React routing)
-  } catch (err) {
-    console.log("Logout error:", err);
-  }
-};
+  // 🔴 LOGOUT
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      nav("/");
+    } catch (err) {
+      console.log("Logout error:", err);
+    }
+  };
 
   return (
     <div
@@ -56,6 +78,7 @@ export default function Navbar() {
     >
       {/* 🔝 NAV */}
       <div className="navSection">
+
         <Link to="/" className="navItem">
           <Home size={18} /> Home
         </Link>
@@ -68,19 +91,37 @@ export default function Navbar() {
           <FileText size={18} /> Logs
         </Link>
 
-        <Link to="/analytics" className="navItem">
-          <BarChart3 size={18} /> Analytics
-        </Link>
+        <Link to="/insights" className="navItem">
+  <BarChart3 size={18} /> Insights
+</Link>
 
         <Link to="/live" className="navItem">
           <Video size={18} /> Live Feed
         </Link>
 
-        <Link to="/alerts" className="navItem">
+        {/* 🔔 ALERTS */}
+        <Link to="/alerts" className="navItem" style={{ position: "relative" }}>
           <Bell size={18} /> Alerts
+
+          {alertCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "6px",
+                background: "#ef4444",
+                color: "white",
+                fontSize: "10px",
+                padding: "2px 6px",
+                borderRadius: "999px",
+              }}
+            >
+              {alertCount > 99 ? "99+" : alertCount}
+            </span>
+          )}
         </Link>
 
-        {/* 🔐 ROLE BASED (FIXED) */}
+        {/* 🔐 ADMIN */}
         {role === "admin" && (
           <Link to="/users" className="navItem">
             <Users size={18} /> Users
@@ -98,7 +139,7 @@ export default function Navbar() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 
-          {/* 🔵 Avatar */}
+          {/* 🔵 AVATAR */}
           <div
             style={{
               width: "40px",
@@ -115,7 +156,7 @@ export default function Navbar() {
           >
             {initials}
 
-            {/* 🟢 Online */}
+            {/* 🟢 ONLINE DOT */}
             <div
               style={{
                 position: "absolute",
@@ -129,7 +170,7 @@ export default function Navbar() {
             />
           </div>
 
-          {/* 🧑 Name + Username */}
+          {/* 👤 USER INFO */}
           <div>
             <div style={{ fontSize: "14px", color: "white" }}>
               {name}
@@ -141,7 +182,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 🔴 Logout */}
+        {/* 🔴 LOGOUT */}
         <button
           onClick={handleLogout}
           style={{
