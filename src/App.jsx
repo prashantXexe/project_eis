@@ -13,7 +13,6 @@ import Logs from "./pages/Logs";
 import Insights from "./pages/Insights";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
-import Login from "./pages/Login";
 import Alerts from "./pages/Alerts";
 
 function Layout() {
@@ -21,17 +20,16 @@ function Layout() {
   const isHome = location.pathname === "/";
 
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // 🔥 role state
+  const [role, setRole] = useState("admin"); // 🔥 default admin
   const [loading, setLoading] = useState(true);
 
-  // 🔥 AUTH LISTENER
+  // 🔥 AUTH LISTENER (optional but kept)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
 
       if (u) {
         try {
-          // 🔥 get role from Firestore
           const q = await getDoc(doc(db, "users", u.uid));
           if (q.exists()) {
             setRole(q.data().role);
@@ -57,15 +55,12 @@ function Layout() {
         overflow: "hidden"
       }}
     >
-      {/* 🔥 NAVBAR + ALERT LISTENER */}
-      {user && (
-        <>
-          <Navbar user={{ name: user.email, role }} />
+      {/* 🔥 ALWAYS SHOW NAVBAR */}
+      <>
+        <Navbar user={{ name: user?.email || "Admin", role }} />
 
-          {/* ❌ Alerts page pe popup band */}
-          {location.pathname !== "/alerts" && <AlertsListener />}
-        </>
-      )}
+        {location.pathname !== "/alerts" && <AlertsListener />}
+      </>
 
       {/* 🔲 MAIN CONTENT */}
       <div
@@ -77,27 +72,19 @@ function Layout() {
         }}
       >
         <Routes>
-          {!user ? (
-            <>
-              <Route path="*" element={<Login />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/storage" element={<Storage />} />
-              <Route path="/logs" element={<Logs />} />
-              <Route path="/insights" element={<Insights />} />
-              <Route path="/live" element={<LiveFeed />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/storage" element={<Storage />} />
+          <Route path="/logs" element={<Logs />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/live" element={<LiveFeed />} />
 
-              {/* 🔐 ADMIN ONLY */}
-              <Route
-                path="/users"
-                element={role === "admin" ? <Users /> : <Home />}
-              />
+          {/* 🔐 ADMIN ONLY */}
+          <Route
+            path="/users"
+            element={role === "admin" ? <Users /> : <Home />}
+          />
 
-              <Route path="/alerts" element={<Alerts />} />
-            </>
-          )}
+          <Route path="/alerts" element={<Alerts />} />
         </Routes>
       </div>
     </div>
