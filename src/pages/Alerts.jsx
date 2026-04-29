@@ -111,24 +111,54 @@ export default function Alerts() {
 
 // 🔲 STAT BOX
 function StatBox({ title, value }) {
+  // 🎨 dynamic color based on title
+  let bg = "#0b1220";
+  let border = "#1f2937";
+
+  if (title.includes("Total")) {
+    bg = "linear-gradient(135deg, #1e3a8a, #0b1220)";
+    border = "#2563eb";
+  }
+
+  if (title.includes("Intrusion")) {
+    bg = "linear-gradient(135deg, #7f1d1d, #0b1220)";
+    border = "#ef4444";
+  }
+
+  if (title.includes("Dwell")) {
+    bg = "linear-gradient(135deg, #78350f, #0b1220)";
+    border = "#f59e0b";
+  }
+
+  if (title.includes("Loitering")) {
+    bg = "linear-gradient(135deg, #064e3b, #0b1220)";
+    border = "#10b981";
+  }
+
   return (
-    <div style={{
-      background: "#0b1220",
-      padding: "20px",
-      borderRadius: "10px",
-      border: "1px solid #1f2937",
-      textAlign: "center"
-    }}>
+    <div
+      style={{
+        background: bg,
+        padding: "20px",
+        borderRadius: "12px",
+        border: `1px solid ${border}`,
+        textAlign: "center",
+        boxShadow: "0 0 10px rgba(0,0,0,0.4)",
+        transition: "0.3s",
+      }}
+    >
       <div style={{ color: "#9ca3af", fontSize: "14px" }}>
         {title}
       </div>
 
-      <div style={{
-        color: "white",
-        fontSize: "24px",
-        fontWeight: "bold",
-        marginTop: "8px"
-      }}>
+      <div
+        style={{
+          color: "white",
+          fontSize: "26px",
+          fontWeight: "bold",
+          marginTop: "8px",
+        }}
+      >
         {value}
       </div>
     </div>
