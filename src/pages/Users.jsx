@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   collection,
+  addDoc,
   deleteDoc,
   doc,
   onSnapshot,
-  updateDoc,
-  setDoc
+  updateDoc
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
@@ -45,18 +45,16 @@ export default function Users() {
     }
 
     try {
-      // ✅ CREATE AUTH USER
+      // ✅ STEP 1: CREATE IN AUTH
       const userCred = await createUserWithEmailAndPassword(
         auth,
         form.email,
         form.password
       );
 
-      const uid = userCred.user.uid;
-
-      // ✅ SAVE FIRESTORE WITH UID AS DOC ID
-      await setDoc(doc(db, "users", uid), {
-        uid,
+      // ✅ STEP 2: SAVE IN FIRESTORE
+      await addDoc(collection(db, "users"), {
+        uid: userCred.user.uid,
         name: form.name,
         username: form.username.toLowerCase(),
         email: form.email,
@@ -82,10 +80,10 @@ export default function Users() {
     setTimeout(() => setToast(""), 3000);
   };
 
-  // 🔥 UPDATE USER
+  // 🔥 UPDATE USER (Firestore only)
   const handleUpdateUser = async () => {
     try {
-      const ref = doc(db, "users", editUser.uid);
+      const ref = doc(db, "users", editUser.id);
 
       await updateDoc(ref, {
         name: form.name,
@@ -109,7 +107,7 @@ export default function Users() {
   // 🔥 DELETE USER (Firestore only)
   const handleDelete = async (user) => {
     try {
-      await deleteDoc(doc(db, "users", user.uid));
+      await deleteDoc(doc(db, "users", user.id));
       setToast("User deleted ❌");
     } catch (err) {
       console.log(err);
@@ -162,24 +160,17 @@ export default function Users() {
 
         <tbody>
           {users.map(u => (
-            <tr key={u.uid}>
+            <tr key={u.id}>
               <td>{u.name}</td>
               <td>{u.username}</td>
               <td>{u.role}</td>
 
-              {/* EDIT */}
               <td>
                 <button
                   className="viewBtn"
                   onClick={() => {
                     setEditUser(u);
-                    setForm({
-                      name: u.name,
-                      username: u.username,
-                      email: u.email,
-                      password: "",
-                      role: u.role
-                    });
+                    setForm(u);
                     setShowModal(true);
                   }}
                 >
@@ -187,7 +178,6 @@ export default function Users() {
                 </button>
               </td>
 
-              {/* DELETE */}
               <td>
                 <button
                   className="deleteBtn"
@@ -257,7 +247,6 @@ export default function Users() {
         </div>
       )}
 
-      {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
