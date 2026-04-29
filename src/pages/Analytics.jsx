@@ -17,6 +17,8 @@ export default function Analytics() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
+    console.log("🔥 Analytics Mounted");
+
     const q = query(collection(db, "alerts"));
 
     const unsub = onSnapshot(q, (snapshot) => {
@@ -30,22 +32,39 @@ export default function Analytics() {
       snapshot.forEach((doc) => {
         const d = doc.data();
 
+        console.log("📄 DOC:", d); // 🔥 DEBUG
+
+        // 🔥 SAFE timestamp
         const time = d.timestamp?.toDate
           ? d.timestamp.toDate()
           : new Date(d.timestamp);
 
+        const type = d.type?.toLowerCase();
+
+        // 🔥 TEST MODE (pehle ye use kar)
+        if (type === "intrusion") intrusion++;
+        if (type === "dwell") dwell++;
+        if (type === "loiter" || type === "loitering") loitering++;
+
+        // 🔥 FINAL MODE (baad me enable kar)
+        /*
         if (time >= last24) {
-          if (d.type === "intrusion") intrusion++;
-          if (d.type === "dwell") dwell++;
-          if (d.type === "loitering") loitering++;
+          if (type === "intrusion") intrusion++;
+          if (type === "dwell") dwell++;
+          if (type === "loiter" || type === "loitering") loitering++;
         }
+        */
       });
 
-      setData([
+      const finalData = [
         { name: "Intrusion", value: intrusion, color: "#ef4444" },
         { name: "Dwell", value: dwell, color: "#f59e0b" },
         { name: "Loitering", value: loitering, color: "#10b981" },
-      ]);
+      ];
+
+      console.log("📊 GRAPH DATA:", finalData); // 🔥 DEBUG
+
+      setData(finalData);
     });
 
     return () => unsub();
@@ -54,7 +73,7 @@ export default function Analytics() {
   return (
     <div style={{ padding: 20 }}>
       <h2 style={{ color: "white", marginBottom: "20px" }}>
-        📊 Analytics (Last 24 Hours)
+        📊 Analytics
       </h2>
 
       <div
@@ -68,39 +87,41 @@ export default function Analytics() {
           boxShadow: "0 0 20px rgba(0,0,0,0.5)",
         }}
       >
-        <ResponsiveContainer>
-          <BarChart data={data} barSize={50}>
-            
-            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+        {data.length === 0 ? (
+          <div style={{ color: "#9ca3af" }}>Loading graph...</div>
+        ) : (
+          <ResponsiveContainer>
+            <BarChart data={data} barSize={50}>
+              <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
 
-            <XAxis
-              dataKey="name"
-              stroke="#9ca3af"
-              tick={{ fill: "#9ca3af" }}
-            />
+              <XAxis
+                dataKey="name"
+                stroke="#9ca3af"
+                tick={{ fill: "#9ca3af" }}
+              />
 
-            <YAxis
-              stroke="#9ca3af"
-              tick={{ fill: "#9ca3af" }}
-            />
+              <YAxis
+                stroke="#9ca3af"
+                tick={{ fill: "#9ca3af" }}
+              />
 
-            <Tooltip
-              contentStyle={{
-                background: "#111827",
-                border: "none",
-                borderRadius: "8px",
-                color: "white"
-              }}
-            />
+              <Tooltip
+                contentStyle={{
+                  background: "#111827",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "white"
+                }}
+              />
 
-            <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={index} fill={entry.color} />
-              ))}
-            </Bar>
-
-          </BarChart>
-        </ResponsiveContainer>
+              <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+                {data.map((entry, index) => (
+                  <Cell key={index} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
