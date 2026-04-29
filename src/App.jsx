@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import Navbar from "./components/Navbar";
 import AlertsListener from "./components/AlertsListener";
@@ -22,7 +23,21 @@ function Layout() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("admin"); // 🔥 default admin
   const [loading, setLoading] = useState(true);
+useEffect(() => {
+  const autoLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        "admin.projecteis@gmail.com",
+        "Admin@EIS"
+      );
+    } catch (err) {
+      console.log("Auto login failed:", err);
+    }
+  };
 
+  autoLogin();
+}, []);
   // 🔥 AUTH LISTENER (optional but kept)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
