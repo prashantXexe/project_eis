@@ -10,7 +10,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Cell
+  Cell,
+  Label
 } from "recharts";
 
 export default function Insights() {
@@ -52,7 +53,9 @@ export default function Insights() {
 
       setStats({ total, intrusion, dwell, loitering });
 
+      // 🔥 UPDATED (Total added)
       setChartData([
+        { name: "Total", value: total, color: "#3b82f6" },
         { name: "Intrusion", value: intrusion, color: "#ef4444" },
         { name: "Dwell", value: dwell, color: "#f59e0b" },
         { name: "Loitering", value: loitering, color: "#10b981" },
@@ -88,7 +91,7 @@ export default function Insights() {
       <div
         style={{
           width: "100%",
-          height: "380px",
+          height: "400px",
           background: "#0b1220",
           padding: "20px",
           borderRadius: "14px",
@@ -101,18 +104,31 @@ export default function Insights() {
             
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
 
+            {/* 🔥 X AXIS */}
             <XAxis
               dataKey="name"
               stroke="#9ca3af"
               tick={{ fill: "#9ca3af" }}
-            />
+            >
+              <Label value="Alert Type" offset={-5} position="insideBottom" fill="#9ca3af" />
+            </XAxis>
 
+            {/* 🔥 Y AXIS */}
             <YAxis
               stroke="#9ca3af"
               tick={{ fill: "#9ca3af" }}
-            />
+            >
+              <Label
+                value="Count"
+                angle={-90}
+                position="insideLeft"
+                fill="#9ca3af"
+              />
+            </YAxis>
 
+            {/* 🔥 TOOLTIP */}
             <Tooltip
+              formatter={(value) => [`${value}`, "Count"]}
               contentStyle={{
                 background: "#111827",
                 border: "none",
@@ -121,6 +137,7 @@ export default function Insights() {
               }}
             />
 
+            {/* 🔥 BARS */}
             <Bar dataKey="value" radius={[10, 10, 0, 0]}>
               {chartData.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
