@@ -1,18 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  Cell,
-  Label
-} from "recharts";
+import InsightsChart from "../components/InsightsChart";
 
 export default function Insights() {
   const [stats, setStats] = useState({
@@ -86,7 +75,7 @@ export default function Insights() {
         <StatBox title="Loitering Events" value={stats.loitering} color="#10b981" />
       </div>
 
-      {/* 🔥 GRAPH */}
+      {/* 🔥 GRAPH (COMPONENT USE) */}
       <div
         style={{
           width: "100%",
@@ -98,63 +87,7 @@ export default function Insights() {
           boxShadow: "0 0 20px rgba(0,0,0,0.5)"
         }}
       >
-        <ResponsiveContainer>
-          <BarChart data={chartData} barSize={40}>
-            
-            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-
-            {/* 🔥 X AXIS */}
-            <XAxis
-              dataKey="name"
-              stroke="#9ca3af"
-              tick={{ fill: "#9ca3af" }}
-            >
-              <Label
-                value="Alert Category"
-                position="insideBottom"
-                offset={-5}
-                fill="#9ca3af"
-              />
-            </XAxis>
-
-            {/* 🔥 Y AXIS */}
-            <YAxis
-              stroke="#9ca3af"
-              tick={{ fill: "#9ca3af" }}
-            >
-              <Label
-                value="Number of Alerts (Last 24h)"
-                angle={-90}
-                position="insideLeft"
-                fill="#9ca3af"
-              />
-            </YAxis>
-
-            {/* 🔥 TOOLTIP */}
-            <Tooltip
-              cursor={{ fill: "transparent" }}   // ❌ removes white hover
-              formatter={(value) => [`${value}`, "Alerts"]}
-              contentStyle={{
-                background: "#111827",
-                border: "1px solid #1f2937",
-                borderRadius: "8px",
-                color: "white"
-              }}
-            />
-
-            {/* 🔥 BARS */}
-            <Bar
-              dataKey="value"
-              radius={[10, 10, 0, 0]}
-              activeBar={false}   // ❌ removes white highlight
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={index} fill={entry.color} />
-              ))}
-            </Bar>
-
-          </BarChart>
-        </ResponsiveContainer>
+        <InsightsChart data={chartData} />
       </div>
     </div>
   );
