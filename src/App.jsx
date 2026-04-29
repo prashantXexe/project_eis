@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 import Navbar from "./components/Navbar";
 import AlertsListener from "./components/AlertsListener";
@@ -9,29 +10,44 @@ import AlertsListener from "./components/AlertsListener";
 import Home from "./pages/Home";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
-import Analytics from "./pages/Analytics";
+import Insights from "./pages/Insights";
 import LiveFeed from "./pages/LiveFeed";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
+import Alerts from "./pages/Alerts";
 
 function Layout() {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // 🔥 role state
   const [loading, setLoading] = useState(true);
 
   // 🔥 AUTH LISTENER
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+
+      if (u) {
+        try {
+          // 🔥 get role from Firestore
+          const q = await getDoc(doc(db, "users", u.uid));
+          if (q.exists()) {
+            setRole(q.data().role);
+          }
+        } catch (err) {
+          console.log("Role fetch error:", err);
+        }
+      }
+
       setLoading(false);
     });
 
     return () => unsub();
   }, []);
 
-  if (loading) return null;
+  if (loading) return <div style={{ color: "white" }}>Loading...</div>;
 
   return (
     <div
@@ -44,8 +60,10 @@ function Layout() {
       {/* 🔥 NAVBAR + ALERT LISTENER */}
       {user && (
         <>
-          <Navbar user={{ name: user.email, role: "admin" }} />
-          <AlertsListener /> {/* ✅ correct JSX comment */}
+          <Navbar user={{ name: user.email, role }} />
+
+          {/* ❌ Alerts page pe popup band */}
+          {location.pathname !== "/alerts" && <AlertsListener />}
         </>
       )}
 
@@ -61,18 +79,23 @@ function Layout() {
         <Routes>
           {!user ? (
             <>
-              {/* 🔐 NOT LOGGED IN */}
               <Route path="*" element={<Login />} />
             </>
           ) : (
             <>
-              {/* 🔓 LOGGED IN */}
               <Route path="/" element={<Home />} />
               <Route path="/storage" element={<Storage />} />
               <Route path="/logs" element={<Logs />} />
-              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/insights" element={<Insights />} />
               <Route path="/live" element={<LiveFeed />} />
-              <Route path="/users" element={<Users />} />
+
+              {/* 🔐 ADMIN ONLY */}
+              <Route
+                path="/users"
+                element={role === "admin" ? <Users /> : <Home />}
+              />
+
+              <Route path="/alerts" element={<Alerts />} />
             </>
           )}
         </Routes>
