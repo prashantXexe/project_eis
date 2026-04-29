@@ -71,7 +71,7 @@ function Layout() {
               <Route path="/" element={<Home />} />
               <Route path="/storage" element={<Storage />} />
               <Route path="/logs" element={<Logs />} />
-              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/Analytics" element={<Analytics />} />
               <Route path="/live" element={<LiveFeed />} />
               <Route path="/users" element={<Users />} />
               <Route path="/alerts" element={<Alerts />} />
