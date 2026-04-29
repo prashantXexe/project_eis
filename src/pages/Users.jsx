@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import {
   collection,
-  addDoc,
   deleteDoc,
   doc,
   onSnapshot,
-  updateDoc
+  updateDoc,
+  setDoc
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebase";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState("");
-  const [editUser, setEditUser] = useState(null); // 🔥 NEW
+  const [editUser, setEditUser] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -23,7 +24,7 @@ export default function Users() {
     role: "user"
   });
 
-  // 🔥 REALTIME USERS LISTENER
+  // 🔥 REALTIME USERS
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
       const data = snapshot.docs.map(doc => ({
@@ -36,15 +37,31 @@ export default function Users() {
     return () => unsubscribe();
   }, []);
 
-  // 🔥 ADD USER
+  // 🔥 CREATE USER (AUTH + FIRESTORE)
   const handleAddUser = async () => {
-    if (!form.email || !form.username || !form.password) {
+    if (!form.email || !form.password) {
       setToast("Invalid entry ❌");
       return;
     }
 
     try {
-      await addDoc(collection(db, "users"), form);
+      // ✅ CREATE AUTH USER
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
+
+      const uid = userCred.user.uid;
+
+      // ✅ SAVE FIRESTORE WITH UID AS DOC ID
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        name: form.name,
+        username: form.username.toLowerCase(),
+        email: form.email,
+        role: form.role
+      });
 
       setToast("User created ✅");
 
@@ -56,9 +73,10 @@ export default function Users() {
         password: "",
         role: "user"
       });
+
     } catch (err) {
-      console.log(err);
-      setToast("Create failed ❌");
+      console.log("CREATE ERROR:", err);
+      setToast(err.message);
     }
 
     setTimeout(() => setToast(""), 3000);
@@ -67,13 +85,12 @@ export default function Users() {
   // 🔥 UPDATE USER
   const handleUpdateUser = async () => {
     try {
-      const ref = doc(db, "users", editUser.id);
+      const ref = doc(db, "users", editUser.uid);
 
       await updateDoc(ref, {
         name: form.name,
-        username: form.username,
+        username: form.username.toLowerCase(),
         email: form.email,
-        password: form.password,
         role: form.role
       });
 
@@ -89,10 +106,10 @@ export default function Users() {
     setTimeout(() => setToast(""), 3000);
   };
 
-  // 🔥 DELETE USER
+  // 🔥 DELETE USER (Firestore only)
   const handleDelete = async (user) => {
     try {
-      await deleteDoc(doc(db, "users", user.id));
+      await deleteDoc(doc(db, "users", user.uid));
       setToast("User deleted ❌");
     } catch (err) {
       console.log(err);
@@ -145,18 +162,24 @@ export default function Users() {
 
         <tbody>
           {users.map(u => (
-            <tr key={u.id}>
+            <tr key={u.uid}>
               <td>{u.name}</td>
               <td>{u.username}</td>
               <td>{u.role}</td>
 
-              {/* 🔥 EDIT */}
+              {/* EDIT */}
               <td>
                 <button
                   className="viewBtn"
                   onClick={() => {
                     setEditUser(u);
-                    setForm(u);
+                    setForm({
+                      name: u.name,
+                      username: u.username,
+                      email: u.email,
+                      password: "",
+                      role: u.role
+                    });
                     setShowModal(true);
                   }}
                 >
@@ -164,7 +187,7 @@ export default function Users() {
                 </button>
               </td>
 
-              {/* 🔥 DELETE */}
+              {/* DELETE */}
               <td>
                 <button
                   className="deleteBtn"
@@ -203,11 +226,14 @@ export default function Users() {
               onChange={e => setForm({ ...form, email: e.target.value })}
             />
 
-            <input
-              placeholder="Password"
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-            />
+            {!editUser && (
+              <input
+                placeholder="Password"
+                type="password"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+              />
+            )}
 
             <select
               value={form.role}
