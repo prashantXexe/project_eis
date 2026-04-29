@@ -6,22 +6,20 @@ export default function AlertsListener() {
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    let isInitialLoad = true;
-
     const q = query(
       collection(db, "alerts"),
       orderBy("timestamp", "desc")
     );
 
+    let initialized = false;
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // ❌ old alerts ignore
-      if (isInitialLoad) {
-        isInitialLoad = false;
-        console.log("⏭️ Initial alerts ignored");
+      // 🔥 first load ignore (old alerts)
+      if (!initialized) {
+        initialized = true;
+        console.log("⏭️ Ignored old alerts");
         return;
       }
-
-      const newAlerts = [];
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
@@ -32,28 +30,23 @@ export default function AlertsListener() {
 
           console.log("🚨 NEW ALERT:", newAlert);
 
-          newAlerts.push(newAlert);
+          // 🔴 add alert (top pe)
+          setAlerts((prev) => {
+            const updated = [newAlert, ...prev];
+            return updated.slice(0, 5); // max 5
+          });
+
+          // ⏱ individual timer (10 sec per alert)
+          setTimeout(() => {
+            setAlerts((prev) =>
+              prev.filter((a) => a.id !== newAlert.id)
+            );
+          }, 10000);
         }
       });
-
-      if (newAlerts.length > 0) {
-        setAlerts((prev) => {
-          const updated = [...newAlerts, ...prev];
-          return updated.slice(0, 5); // 🔥 max 5
-        });
-      }
     });
 
     return () => unsubscribe();
-  }, []);
-
-  // ⏱ auto remove every 10 sec
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAlerts((prev) => prev.slice(0, -1)); // remove oldest
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -87,7 +80,6 @@ function AlertCard({ alert }) {
         width: "260px",
         border: "1px solid #1f2937",
         boxShadow: "0 0 10px rgba(0,0,0,0.6)",
-        animation: "fadeIn 0.3s ease",
       }}
     >
       <div style={{ color: "#ef4444", fontWeight: "bold" }}>
