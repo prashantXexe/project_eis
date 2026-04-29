@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { useEffect, useState } from "react";
+import { collection, onSnapshot, query } from "firebase/firestore";
+
 import {
   Home,
   Database,
@@ -14,12 +16,28 @@ import {
 
 export default function Navbar() {
 
+  const nav = useNavigate(); // ✅ FIX
+
+  // 🔔 ALERT COUNT
+  const [alertCount, setAlertCount] = useState(0);
+
+  // 🔥 REALTIME ALERT COUNT
+  useEffect(() => {
+    const q = query(collection(db, "alerts"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setAlertCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // ✅ SAFE DATA
   const username = localStorage.getItem("username") || "user";
   const name = localStorage.getItem("name") || username || "User";
   const role = localStorage.getItem("role");
 
-  // ✅ SAFE INITIALS (PB type)
+  // ✅ INITIALS
   const initials = name
     ? name
         .trim()
@@ -30,16 +48,16 @@ export default function Navbar() {
         .toUpperCase()
     : "US";
 
-  // 🔥 Logout
- const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    localStorage.clear();
-    nav("/");   // 🔥 FIX (React routing)
-  } catch (err) {
-    console.log("Logout error:", err);
-  }
-};
+  // 🔥 LOGOUT
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      nav("/");
+    } catch (err) {
+      console.log("Logout error:", err);
+    }
+  };
 
   return (
     <div
@@ -56,6 +74,7 @@ export default function Navbar() {
     >
       {/* 🔝 NAV */}
       <div className="navSection">
+
         <Link to="/" className="navItem">
           <Home size={18} /> Home
         </Link>
@@ -76,11 +95,29 @@ export default function Navbar() {
           <Video size={18} /> Live Feed
         </Link>
 
-        <Link to="/alerts" className="navItem">
+        {/* 🔔 ALERTS WITH BADGE */}
+        <Link to="/alerts" className="navItem" style={{ position: "relative" }}>
           <Bell size={18} /> Alerts
+
+          {alertCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "6px",
+                background: "#ef4444",
+                color: "white",
+                fontSize: "10px",
+                padding: "2px 6px",
+                borderRadius: "999px",
+              }}
+            >
+              {alertCount}
+            </span>
+          )}
         </Link>
 
-        {/* 🔐 ROLE BASED (FIXED) */}
+        {/* 🔐 ADMIN */}
         {role === "admin" && (
           <Link to="/users" className="navItem">
             <Users size={18} /> Users
@@ -115,7 +152,7 @@ export default function Navbar() {
           >
             {initials}
 
-            {/* 🟢 Online */}
+            {/* 🟢 ONLINE */}
             <div
               style={{
                 position: "absolute",
@@ -129,7 +166,7 @@ export default function Navbar() {
             />
           </div>
 
-          {/* 🧑 Name + Username */}
+          {/* 🧑 INFO */}
           <div>
             <div style={{ fontSize: "14px", color: "white" }}>
               {name}
@@ -141,7 +178,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 🔴 Logout */}
+        {/* 🔴 LOGOUT */}
         <button
           onClick={handleLogout}
           style={{
