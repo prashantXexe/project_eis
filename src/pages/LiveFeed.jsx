@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://speaking-mothers-basename-experienced.trycloudflare.com/video";
+    "https://imported-validity-vegetation-contests.trycloudflare.com/video";
 
   return (
     <div

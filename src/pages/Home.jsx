@@ -14,7 +14,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "https://speaking-mothers-basename-experienced.trycloudflare.com/video";
+    "https://imported-validity-vegetation-contests.trycloudflare.com/video";
 
   // 🔥 REALTIME DATA (DETECTIONS)
   useEffect(() => {
