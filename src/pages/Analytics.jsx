@@ -1,116 +1,107 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { db } from "../firebase";
+import { collection, onSnapshot, query } from "firebase/firestore";
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Cell
+} from "recharts";
 
 export default function Analytics() {
-  const location = useLocation();
-  const nav = useNavigate();
+  const [data, setData] = useState([]);
 
-  const alertData = location.state;
+  useEffect(() => {
+    const q = query(collection(db, "alerts"));
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      let intrusion = 0;
+      let dwell = 0;
+      let loitering = 0;
+
+      const now = new Date();
+      const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+      snapshot.forEach((doc) => {
+        const d = doc.data();
+
+        const time = d.timestamp?.toDate
+          ? d.timestamp.toDate()
+          : new Date(d.timestamp);
+
+        if (time >= last24) {
+          if (d.type === "intrusion") intrusion++;
+          if (d.type === "dwell") dwell++;
+          if (d.type === "loitering") loitering++;
+        }
+      });
+
+      setData([
+        { name: "Intrusion", value: intrusion, color: "#ef4444" },
+        { name: "Dwell", value: dwell, color: "#f59e0b" },
+        { name: "Loitering", value: loitering, color: "#10b981" },
+      ]);
+    });
+
+    return () => unsub();
+  }, []);
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        color: "white",
-      }}
-    >
-      <h2 style={{ marginBottom: "20px" }}>📊 Analytics</h2>
+    <div style={{ padding: 20 }}>
+      <h2 style={{ color: "white", marginBottom: "20px" }}>
+        📊 Analytics (Last 24 Hours)
+      </h2>
 
-      {/* ❌ If no alert passed */}
-      {!alertData && (
-        <div
-          style={{
-            background: "#111827",
-            padding: "20px",
-            borderRadius: "10px",
-            border: "1px solid #1f2937",
-          }}
-        >
-          <p>No alert selected.</p>
+      <div
+        style={{
+          width: "100%",
+          height: "360px",
+          background: "#0b1220",
+          padding: "20px",
+          borderRadius: "14px",
+          border: "1px solid #1f2937",
+          boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+        }}
+      >
+        <ResponsiveContainer>
+          <BarChart data={data} barSize={50}>
+            
+            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
 
-          <button
-            onClick={() => nav("/")}
-            style={{
-              marginTop: "10px",
-              padding: "8px 12px",
-              background: "#2563eb",
-              border: "none",
-              borderRadius: "6px",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Go Back Home
-          </button>
-        </div>
-      )}
+            <XAxis
+              dataKey="name"
+              stroke="#9ca3af"
+              tick={{ fill: "#9ca3af" }}
+            />
 
-      {/* ✅ If alert exists */}
-      {alertData && (
-        <div
-          style={{
-            background: "#0f172a",
-            padding: "20px",
-            borderRadius: "10px",
-            border: "1px solid #1f2937",
-            maxWidth: "500px",
-          }}
-        >
-          <h3 style={{ color: "#ef4444" }}>🚨 Alert Details</h3>
+            <YAxis
+              stroke="#9ca3af"
+              tick={{ fill: "#9ca3af" }}
+            />
 
-          <div style={{ marginTop: "10px", fontSize: "14px" }}>
-            <p>
-              <b>Type:</b> {alertData.type}
-            </p>
-
-            <p>
-              <b>Zone:</b> {alertData.zone}
-            </p>
-
-            <p>
-              <b>Dwell Time:</b>{" "}
-              {alertData.dwell ? `${alertData.dwell.toFixed(2)} sec` : "N/A"}
-            </p>
-
-            <p>
-              <b>Time:</b>{" "}
-              {alertData.timestamp
-                ? new Date(alertData.timestamp).toLocaleString()
-                : "N/A"}
-            </p>
-          </div>
-
-          {/* 🖼️ Image */}
-          {alertData.image && (
-            <img
-              src={alertData.image}
-              alt="Alert"
-              style={{
-                width: "100%",
-                marginTop: "15px",
+            <Tooltip
+              contentStyle={{
+                background: "#111827",
+                border: "none",
                 borderRadius: "8px",
-                border: "1px solid #1f2937",
+                color: "white"
               }}
             />
-          )}
 
-          {/* 🔙 Back Button */}
-          <button
-            onClick={() => nav("/")}
-            style={{
-              marginTop: "15px",
-              padding: "8px 12px",
-              background: "#2563eb",
-              border: "none",
-              borderRadius: "6px",
-              color: "white",
-              cursor: "pointer",
-              width: "100%",
-            }}
-          >
-            Back to Home
-          </button>
-        </div>
-      )}
+            <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Bar>
+
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
