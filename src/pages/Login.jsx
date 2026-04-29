@@ -4,6 +4,7 @@ import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "../index.css";
 
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -11,19 +12,18 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // 🔥 IMPORTANT (missing tha)
+  const particlesInit = async (engine) => {
+    await loadFull(engine);
+  };
+
   const handleLogin = async () => {
     if (loading) return;
-
-    if (!username || !password) {
-      setError("Enter username & password ❌");
-      return;
-    }
 
     setLoading(true);
     setError("");
 
     try {
-      // 🔥 FIXED QUERY
       const q = query(
         collection(db, "users"),
         where("username", "==", username.trim().toLowerCase())
@@ -39,26 +39,19 @@ export default function Login() {
 
       const userData = snapshot.docs[0].data();
 
-      // 🔥 disabled check
-      if (userData.disabled) {
-        setError("User disabled ❌");
-        setLoading(false);
-        return;
-      }
-
-      // 🔥 LOGIN WITH FIREBASE AUTH
       await signInWithEmailAndPassword(
         auth,
         userData.email,
         password
       );
 
-      // 🔥 redirect
-      window.location.href = "/";
+      localStorage.setItem("role", userData.role);
+      localStorage.setItem("username", userData.username);
+      localStorage.setItem("name", userData.name);
 
-    } catch (err) {
-      console.log("LOGIN ERROR:", err);
-      setError("Invalid password or login failed ❌");
+      window.location.href = "/";
+    } catch {
+      setError("Login failed ❌");
     }
 
     setLoading(false);
@@ -67,20 +60,20 @@ export default function Login() {
   return (
     <div className="loginOuter">
 
-      {/* LEFT SIDE */}
+     
+      {/* LEFT */}
       <div className="loginBrand">
         <h1>funch.</h1>
         <p>Login page</p>
       </div>
 
-      {/* LOGIN CARD */}
-      <div className="loginCard">
+      {/* CARD */}
+      <div className="loginCard" style={{ position: "relative", zIndex: 2 }}>
         <h2>Login</h2>
         <p className="subText">
           Secure access to surveillance system
         </p>
 
-        {/* USERNAME */}
         <input
           type="text"
           placeholder="Username"
@@ -90,7 +83,6 @@ export default function Login() {
           }
         />
 
-        {/* PASSWORD */}
         <div className="passwordBox">
           <input
             type={showPass ? "text" : "password"}
@@ -103,17 +95,16 @@ export default function Login() {
           </span>
         </div>
 
-        {/* BUTTON */}
         <button onClick={handleLogin} disabled={loading}>
           {loading ? "Signing in..." : "Login"}
         </button>
 
-        {/* ERROR */}
         {error && <p className="error">{error}</p>}
       </div>
 
-      {/* RIGHT IMAGE */}
+      {/* IMAGE */}
       <div className="loginImage"></div>
+
     </div>
   );
 }

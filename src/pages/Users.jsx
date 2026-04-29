@@ -2,21 +2,16 @@ import { useEffect, useState } from "react";
 import {
   collection,
   addDoc,
+  deleteDoc,
   doc,
-  onSnapshot,
-  updateDoc,
-  query,
-  where,
-  getDocs
+  onSnapshot
 } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState("");
-  const [editUser, setEditUser] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -26,7 +21,7 @@ export default function Users() {
     role: "user"
   });
 
-  // 🔥 REALTIME USERS
+  // 🔥 REALTIME USERS LISTENER
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
       const data = snapshot.docs.map(doc => ({
@@ -39,46 +34,18 @@ export default function Users() {
     return () => unsubscribe();
   }, []);
 
-  // 🔥 CREATE USER
+  // 🔥 ADD USER
   const handleAddUser = async () => {
-    if (!form.email || !form.password) {
+    if (!form.email || !form.username || !form.password) {
       setToast("Invalid entry ❌");
+      setTimeout(() => setToast(""), 3000);
       return;
     }
 
     try {
-      // ✅ USERNAME DUPLICATE CHECK
-      const q = query(
-        collection(db, "users"),
-        where("username", "==", form.username.toLowerCase())
-      );
+      await addDoc(collection(db, "users"), form);
 
-      const snap = await getDocs(q);
-
-      if (!snap.empty) {
-        setToast("Username exists ❌");
-        return;
-      }
-
-      // ✅ CREATE IN AUTH
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password
-      );
-
-      // ✅ SAVE IN FIRESTORE
-      await addDoc(collection(db, "users"), {
-        uid: userCred.user.uid,
-        name: form.name,
-        username: form.username.toLowerCase(),
-        email: form.email,
-        role: form.role,
-        disabled: false,
-        createdAt: new Date()
-      });
-
-      setToast("User created ✅");
+      setToast(`${form.role === "admin" ? "Admin" : "User"} created ✅`);
 
       setShowModal(false);
       setForm({
@@ -88,52 +55,21 @@ export default function Users() {
         password: "",
         role: "user"
       });
-
-    } catch (err) {
-      console.log("CREATE ERROR:", err);
-      setToast(err.message);
+    } catch {
+      setToast("Something went wrong ❌");
     }
 
     setTimeout(() => setToast(""), 3000);
   };
 
-  // 🔥 UPDATE USER (Firestore only)
-  const handleUpdateUser = async () => {
-    try {
-      const ref = doc(db, "users", editUser.id);
-
-      await updateDoc(ref, {
-        name: form.name,
-        username: form.username.toLowerCase(),
-        role: form.role
-        // ❌ email update removed (important)
-      });
-
-      setToast("User updated ✅");
-      setShowModal(false);
-      setEditUser(null);
-
-    } catch (err) {
-      console.log(err);
-      setToast("Update failed ❌");
-    }
-
-    setTimeout(() => setToast(""), 3000);
-  };
-
-  // 🔥 DISABLE USER (instead of delete)
+  // 🔥 DELETE USER
   const handleDelete = async (user) => {
-    if (!window.confirm("Disable user?")) return;
-
     try {
-      await updateDoc(doc(db, "users", user.id), {
-        disabled: true
-      });
+      await deleteDoc(doc(db, "users", user.id));
 
-      setToast("User disabled ❌");
-    } catch (err) {
-      console.log(err);
-      setToast("Disable failed ❌");
+      setToast(`${user.role === "admin" ? "Admin" : "User"} deleted ❌`);
+    } catch {
+      setToast("Delete failed ❌");
     }
 
     setTimeout(() => setToast(""), 3000);
@@ -141,128 +77,117 @@ export default function Users() {
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* HEADER */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        marginBottom: "16px"
-      }}>
-        <h2>Admin Panel</h2>
+
+      {/* 🔥 HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "16px"
+        }}
+      >
+        <h2 style={{ margin: 0 }}>Admin Panel</h2>
 
         <button
           className="createBtn"
-          onClick={() => {
-            setEditUser(null);
-            setForm({
-              name: "",
-              username: "",
-              email: "",
-              password: "",
-              role: "user"
-            });
-            setShowModal(true);
-          }}
+          onClick={() => setShowModal(true)}
         >
           + Create User
         </button>
       </div>
 
-      {/* TABLE */}
-      <table className="logTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Edit</th>
-            <th>Disable</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {users.map(u => (
-            <tr key={u.id}>
-              <td>{u.name}</td>
-              <td>{u.username}</td>
-              <td>{u.role}</td>
-
-              <td style={{ color: u.disabled ? "red" : "green" }}>
-                {u.disabled ? "Disabled" : "Active"}
-              </td>
-
-              <td>
-                <button
-                  className="viewBtn"
-                  onClick={() => {
-                    setEditUser(u);
-                    setForm(u);
-                    setShowModal(true);
-                  }}
-                >
-                  Edit
-                </button>
-              </td>
-
-              <td>
-                <button
-                  className="deleteBtn"
-                  onClick={() => handleDelete(u)}
-                >
-                  Disable
-                </button>
-              </td>
+      {/* 🔥 TABLE */}
+      <div className="logWrapper">
+        <table className="logTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Edit</th>
+              <th>Delete</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
 
-      {/* MODAL */}
+          <tbody>
+            {users.map(u => (
+              <tr key={u.id}>
+                <td>{u.name}</td>
+                <td>{u.username}</td>
+                <td>{u.role}</td>
+
+                <td>
+                  <button className="viewBtn">Edit</button>
+                </td>
+
+                <td>
+                  <button
+                    className="deleteBtn"
+                    onClick={() => handleDelete(u)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 🔥 MODAL */}
       {showModal && (
         <div className="modal">
           <div className="modalContent">
 
-            <h3>{editUser ? "Edit User" : "Create User"}</h3>
+            <h3>Create User</h3>
 
             <input
               placeholder="Name"
               value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
+              onChange={e =>
+                setForm({ ...form, name: e.target.value })
+              }
             />
 
             <input
               placeholder="Username"
               value={form.username}
-              onChange={e => setForm({ ...form, username: e.target.value })}
+              onChange={e =>
+                setForm({ ...form, username: e.target.value })
+              }
             />
 
             <input
               placeholder="Email"
               value={form.email}
-              disabled={editUser} // 🔥 IMPORTANT
-              onChange={e => setForm({ ...form, email: e.target.value })}
+              onChange={e =>
+                setForm({ ...form, email: e.target.value })
+              }
             />
 
-            {!editUser && (
-              <input
-                placeholder="Password"
-                type="password"
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-              />
-            )}
+            <input
+              placeholder="Password"
+              type="password"
+              value={form.password}
+              onChange={e =>
+                setForm({ ...form, password: e.target.value })
+              }
+            />
 
             <select
               value={form.role}
-              onChange={e => setForm({ ...form, role: e.target.value })}
+              onChange={e =>
+                setForm({ ...form, role: e.target.value })
+              }
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
 
             <div className="modalActions">
-              <button onClick={editUser ? handleUpdateUser : handleAddUser}>
-                {editUser ? "Update" : "Create"}
+              <button onClick={handleAddUser}>
+                Create
               </button>
 
               <button onClick={() => setShowModal(false)}>
@@ -274,6 +199,7 @@ export default function Users() {
         </div>
       )}
 
+      {/* 🔥 TOAST */}
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
