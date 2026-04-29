@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://integrating-dryer-lime-compilation.trycloudflare.com/video";
+    "https://api-idaho-jvc-mention.trycloudflare.com/video";
 
   return (
     <div
