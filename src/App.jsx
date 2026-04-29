@@ -44,11 +44,13 @@ function Layout() {
     >
       {/* 🔥 NAVBAR + ALERT LISTENER */}
       {user && (
-        <>
-          <Navbar user={{ name: user.email, role: "admin" }} />
-          <AlertsListener /> {/* ✅ correct JSX comment */}
-        </>
-      )}
+  <>
+    <Navbar user={{ name: user.email, role: "admin" }} />
+
+    {/* ❌ Alerts page pe popup band */}
+    {location.pathname !== "/alerts" && <AlertsListener />}
+  </>
+)};
 
       {/* 🔲 MAIN CONTENT */}
       <div
