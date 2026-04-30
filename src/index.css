@@ -622,3 +622,112 @@ a:hover {
 .headerBar h2 {
   margin: 0;
 }
+/* 🔥 NEW SPLIT LOGIN DESIGN */
+.loginContainer {
+  height: 100vh;
+  display: flex;
+}
+
+/* LEFT SIDE */
+.loginLeft {
+  flex: 1;
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+.loginLeft h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.loginLeft p {
+  color: rgba(255,255,255,0.8);
+}
+
+/* RIGHT SIDE */
+.loginRight {
+  flex: 1;
+  background: #f3f4f6;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* LOGIN BOX */
+.loginBox {
+  width: 340px;
+  background: white;
+  padding: 28px;
+  border-radius: 12px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* TEXT */
+.loginBox h2 {
+  margin: 0;
+}
+
+.subText {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* INPUT */
+.loginBox input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+/* FOCUS */
+.loginBox input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 6px rgba(124,58,237,0.3);
+}
+
+/* PASSWORD */
+.loginBox .passwordBox {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+}
+
+/* BUTTON */
+.loginBox button {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+  color: white;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.loginBox button:hover {
+  transform: scale(1.03);
+}
+
+/* FORGOT */
+.forgot {
+  text-align: center;
+  font-size: 12px;
+  color: #7c3aed;
+  cursor: pointer;
+}

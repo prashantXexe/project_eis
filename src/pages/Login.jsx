@@ -73,9 +73,20 @@ export default function Login() {
   };
 
   return (
-    <div className="loginOuter">
-      <div className="loginCard">
-        <h2>Login</h2>
+  <div className="loginContainer">
+
+    {/* LEFT SIDE */}
+    <div className="loginLeft">
+      <h2>Admin Dashboard</h2>
+      <p>Track and manage your system</p>
+    </div>
+
+    {/* RIGHT SIDE */}
+    <div className="loginRight">
+      <div className="loginBox">
+
+        <h2>Welcome back 👋</h2>
+        <p className="subText">Login to continue</p>
 
         <input
           type="text"
@@ -96,7 +107,6 @@ export default function Login() {
               if (e.key === "Enter") handleLogin();
             }}
           />
-
           <span onClick={() => setShowPass(!showPass)}>
             {showPass ? "🙈" : "👁"}
           </span>
@@ -106,8 +116,12 @@ export default function Login() {
           {loading ? "Signing in..." : "Login"}
         </button>
 
+        <p className="forgot">Forgot Password?</p>
+
         {error && <p className="error">{error}</p>}
       </div>
     </div>
-  );
+
+  </div>
+);
 }
