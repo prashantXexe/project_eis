@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import "../index.css";
-
+import { auth, db } from "./firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+} from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -12,67 +17,65 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔥 IMPORTANT (missing tha)
-  const particlesInit = async (engine) => {
-    await loadFull(engine);
-  };
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
-    if (loading) return;
+    if (!username || !password) {
+      setError("All fields required ❌");
+      return;
+    }
 
     setLoading(true);
     setError("");
 
     try {
+      // 🔍 username → email lookup
       const q = query(
         collection(db, "users"),
-        where("username", "==", username.trim().toLowerCase())
+        where("username", "==", username.trim().toLowerCase()),
+        limit(1)
       );
 
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) {
-        setError("User not found ❌");
-        setLoading(false);
-        return;
+        throw new Error("User not found ❌");
       }
 
       const userData = snapshot.docs[0].data();
 
+      // 🔐 Firebase Auth login
       await signInWithEmailAndPassword(
         auth,
         userData.email,
         password
       );
 
+      // 💾 Save session
       localStorage.setItem("role", userData.role);
       localStorage.setItem("username", userData.username);
       localStorage.setItem("name", userData.name);
 
-      window.location.href = "/";
-    } catch {
-      setError("Login failed ❌");
-    }
+      // 🚀 Redirect
+      navigate("/");
 
-    setLoading(false);
+    } catch (err) {
+      if (err.code === "auth/wrong-password") {
+        setError("Wrong password ❌");
+      } else if (err.code === "auth/invalid-email") {
+        setError("Invalid email ❌");
+      } else {
+        setError(err.message || "Login failed ❌");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="loginOuter">
-
-     
-      {/* LEFT */}
-      <div className="loginBrand">
-        <h1>funch.</h1>
-        <p>Login page</p>
-      </div>
-
-      {/* CARD */}
-      <div className="loginCard" style={{ position: "relative", zIndex: 2 }}>
+      <div className="loginCard">
         <h2>Login</h2>
-        <p className="subText">
-          Secure access to surveillance system
-        </p>
 
         <input
           type="text"
@@ -89,7 +92,11 @@ export default function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
+
           <span onClick={() => setShowPass(!showPass)}>
             {showPass ? "🙈" : "👁"}
           </span>
@@ -101,10 +108,6 @@ export default function Login() {
 
         {error && <p className="error">{error}</p>}
       </div>
-
-      {/* IMAGE */}
-      <div className="loginImage"></div>
-
     </div>
   );
 }
