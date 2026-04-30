@@ -77,15 +77,29 @@ export default function Login() {
 
     {/* LEFT SIDE */}
     <div className="loginLeft">
-      <h2>Admin Dashboard</h2>
-      <p>Track and manage your system</p>
-    </div>
+
+  <h1 className="projectTitle">
+    Edge-Based Surveillance System
+  </h1>
+
+  <p className="projectTag">
+    Intelligent perimeter threat detection powered by edge computing
+  </p>
+
+  <div className="featureList">
+    <div className="featureItem">🚨 Real-time intrusion detection</div>
+    <div className="featureItem">⚡ Edge AI processing (no cloud delay)</div>
+    <div className="featureItem">📡 Smart alert & monitoring system</div>
+    <div className="featureItem">🛡️ Secure & scalable architecture</div>
+  </div>
+
+</div>
 
     {/* RIGHT SIDE */}
     <div className="loginRight">
       <div className="loginBox">
 
-        <h2>Welcome back 👋</h2>
+        <h2>Edge Based Surveillance System Login</h2>
         <p className="subText">Login to continue</p>
 
         <input
