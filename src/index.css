@@ -681,15 +681,11 @@ a:hover {
 .loginBox {
   width: 340px;
 
-  padding: 28px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(14px);
+
   border-radius: 14px;
-
-  /* 🔥 IMAGE + DARK OVERLAY */
-  background: 
-    linear-gradient(rgba(2,6,23,0.85), rgba(2,6,23,0.95)),
-    url("https://wallpapercave.com/wp/wp5502848.jpg") center/cover no-repeat;
-
-  backdrop-filter: blur(10px);
+  padding: 28px;
 
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: 0 25px 50px rgba(0,0,0,0.6);
