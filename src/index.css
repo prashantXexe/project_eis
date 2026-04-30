@@ -818,3 +818,15 @@ a:hover {
   font-size: 13px;
   color: #9ca3af;
 }
+
+.mainSub {
+  margin-top: 16px;
+  font-size: 15px;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+}
+
+.mainSub span {
+  color: #22c55e;
+  font-weight: 500;
+}

@@ -83,8 +83,8 @@ export default function Login() {
   </h1>
 
   <p className="mainSub">
-    Based on perimeter threat detection
-  </p>
+  Based on <span>Perimeter Threat Detection</span>
+</p>
 
   <div className="featureList">
 
