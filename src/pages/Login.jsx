@@ -159,9 +159,7 @@ export default function Login() {
           {loading ? "Signing in..." : "Login"}
         </button>
 
-        <p className="forgot">Forgot Password?</p>
 
-        {error && <p className="error">{error}</p>}
       </div>
     </div>
 
