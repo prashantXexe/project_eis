@@ -76,21 +76,50 @@ export default function Login() {
   <div className="loginContainer">
 
     {/* LEFT SIDE */}
-    <div className="loginLeft">
+   <div className="loginLeft">
 
-  <h1 className="projectTitle">
+  <h1 className="mainTitle">
     Edge-Based Surveillance System
   </h1>
 
-  <p className="projectTag">
-    Intelligent perimeter threat detection powered by edge computing
+  <p className="mainSub">
+    Based on perimeter threat detection
   </p>
 
   <div className="featureList">
-    <div className="featureItem">🚨 Real-time intrusion detection</div>
-    <div className="featureItem">⚡ Edge AI processing (no cloud delay)</div>
-    <div className="featureItem">📡 Smart alert & monitoring system</div>
-    <div className="featureItem">🛡️ Secure & scalable architecture</div>
+
+    <div className="featureItem">
+      <span className="icon">●</span>
+      <div>
+        <h4>Real-time Intrusion Detection</h4>
+        <p>Instant alerts for unauthorized access</p>
+      </div>
+    </div>
+
+    <div className="featureItem">
+      <span className="icon">●</span>
+      <div>
+        <h4>Edge AI Processing</h4>
+        <p>No cloud latency, faster decisions</p>
+      </div>
+    </div>
+
+    <div className="featureItem">
+      <span className="icon">●</span>
+      <div>
+        <h4>Smart Monitoring</h4>
+        <p>Continuous tracking & alert system</p>
+      </div>
+    </div>
+
+    <div className="featureItem">
+      <span className="icon">●</span>
+      <div>
+        <h4>Secure Architecture</h4>
+        <p>Highly scalable & protected system</p>
+      </div>
+    </div>
+
   </div>
 
 </div>

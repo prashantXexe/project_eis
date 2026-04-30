@@ -326,19 +326,6 @@ a:hover {
   background: rgba(34, 197, 94, 0.08);
   transition: 0.2s;
 }
-.loginOuter {
-  position: fixed;
-  inset: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  /* 🔥 FULL SCREEN BACKGROUND */
-  background: url("https://images.unsplash.com/photo-1620712943543-bcc4688e7485")
-    center/cover no-repeat;
-  overflow: hidden;     /* 🔥 no scroll */
-}
 
 /* LEFT TEXT */
 .loginBrand {
@@ -377,10 +364,6 @@ a:hover {
   margin: 0;
 }
 
-.subText {
-  font-size: 12px;
-  color: #9ca3af;
-}
 
 .loginCard input {
   padding: 10px;
@@ -422,13 +405,7 @@ a:hover {
 }
 
 /* IMAGE */
-.loginImage {
-  width: 45%;
-  height: 90vh;
-  border-radius: 16px;
-  background: url("https://images.unsplash.com/photo-1639322537228-f710d846310a")
-    center/cover no-repeat;
-}
+
 
 /* ERROR */
 .error {
@@ -669,11 +646,7 @@ a:hover {
 }
 
 /* FEATURES */
-.featureList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+
 
 /* EACH FEATURE */
 .featureItem {
@@ -730,6 +703,7 @@ a:hover {
 .subText {
   font-size: 13px;
   color: #9ca3af;
+  line-height: 1.5;
 }
 
 /* INPUT */
@@ -785,4 +759,62 @@ a:hover {
 .error {
   color: #ef4444;
   font-size: 13px;
+}
+/* 🔥 MAIN TITLE */
+.mainTitle {
+  font-size: 48px;        /* बड़ा font */
+  font-weight: 700;
+  margin: 0;
+
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+/* SUB TEXT */
+.mainSub {
+  margin-top: 16px;       /* spacing */
+  font-size: 16px;
+  color: #9ca3af;
+   max-width: 400px;
+  line-height: 1.5;
+}
+
+/* FEATURE LIST */
+.featureList {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ITEM */
+.featureItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* ICON */
+.icon {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+/* TEXT */
+.featureItem h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.featureItem p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #9ca3af;
 }
