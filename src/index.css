@@ -611,3 +611,14 @@ a:hover {
   color: #020617;
   box-shadow: 0 0 12px rgba(34,197,94,0.5);
 }
+
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+.headerBar h2 {
+  margin: 0;
+}
