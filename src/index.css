@@ -671,10 +671,16 @@ a:hover {
 /* RIGHT SIDE */
 .loginRight {
   flex: 1;
+
+  /* 🔥 GRADIENT + IMAGE */
+  background: 
+    radial-gradient(circle at top right, rgba(34,197,94,0.2), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(59,130,246,0.2), transparent 40%),
+    url("https://wallpaperaccess.com/full/862209.jpg") center/cover no-repeat;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #020617;
 }
 
 /* LOGIN BOX */
