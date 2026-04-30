@@ -687,7 +687,7 @@ a:hover {
   /* 🔥 IMAGE + DARK OVERLAY */
   background: 
     linear-gradient(rgba(2,6,23,0.85), rgba(2,6,23,0.95)),
-    url("https://images.unsplash.com/photo-1581090700227-1e8e4c44c7f2") center/cover no-repeat;
+    url("https://wallpapercave.com/wp/wp5502848.jpg") center/cover no-repeat;
 
   backdrop-filter: blur(10px);
 
