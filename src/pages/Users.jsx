@@ -154,15 +154,18 @@ export default function Users() {
     <div style={{ padding: "20px" }}>
 
       {/* HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div className="headerBar">
         <h2>Admin Panel</h2>
-        <button onClick={() => setShowModal(true)}>
+        <button className="createBtn" onClick={() => setShowModal(true)}>
           + Create User
         </button>
       </div>
 
       {/* TABLE */}
-      <table style={{ width: "100%", marginTop: "20px" }}>
+      <div className="logWrapper">
+  <div className="logTableContainer">
+
+    <table className="logTable">
         <thead>
           <tr>
             <th>Name</th>
@@ -181,20 +184,24 @@ export default function Users() {
               <td>{u.role}</td>
 
               <td>
-                <button onClick={() => handleEditClick(u)}>
+                <button className="viewBtn" onClick={() => handleEditClick(u)}>
                   Edit
                 </button>
               </td>
 
               <td>
-                <button onClick={() => handleDelete(u)}>
+                <button className="deleteBtn" onClick={() => handleDelete(u)}>
                   Delete
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
+      
       </table>
+
+  </div>
+</div>
 
       {/* MODAL */}
       {showModal && (
@@ -266,5 +273,6 @@ export default function Users() {
       {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
     </div>
+      
   );
 }
