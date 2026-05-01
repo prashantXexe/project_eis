@@ -152,7 +152,7 @@ export default function Home() {
       width: "120%",          // 👈 zoom out trick
       height: "150%",
       border: "none",
-      transform: "scale(0.8)", // 👈 actual scaling
+      transform: "scale(0.9)", // 👈 actual scaling
       transformOrigin: "top left",
     }}
     allow="autoplay; camera; microphone"
