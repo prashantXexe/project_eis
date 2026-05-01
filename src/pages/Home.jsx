@@ -110,17 +110,15 @@ export default function Home() {
           }}
         >
           <div
-            style={{
-              width: "100%",
-              maxWidth: "500px",
-              aspectRatio: "4 / 3",
-              background: "#000",
-              borderRadius: "10px",
-              overflow: "hidden",
-              margin: "0 auto",
-              position: "relative",
-            }}
-          >
+  style={{
+    width: "100%",
+    height: "100%",
+    background: "#000",
+    borderRadius: "10px",
+    overflow: "hidden",   // 🔥 scroll remove
+    position: "relative",
+  }}
+>
             <div
               style={{
                 position: "absolute",
@@ -138,12 +136,13 @@ export default function Home() {
               🔴 Cam 1
             </div>
 
-            <iframe
+    <iframe
   src={STREAM_URL}
   style={{
     width: "100%",
     height: "100%",
     border: "none",
+    objectFit: "cover",
   }}
   allow="autoplay; camera; microphone"
 />
