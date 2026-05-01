@@ -52,7 +52,7 @@ export default function AlertsListener() {
   setAlerts((prev) =>
     prev.filter((a) => a.id !== id)
   );
-}, 30000);
+}, 10000);
         }
       });
     });
