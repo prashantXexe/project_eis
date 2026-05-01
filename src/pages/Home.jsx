@@ -113,22 +113,26 @@ export default function Home() {
   style={{
     width: "100%",
     height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    background: "#000",
+    borderRadius: "10px",
+    overflow: "hidden",   // 🔥 scroll remove
+    position: "relative",
   }}
 >
-  <div
-    style={{
-      width: "90%",        // 👈 size control (adjust kar sakta hai)
-      maxWidth: "400px",   // 👈 max limit
-      aspectRatio: "4 / 3",
-      background: "#000",
-      borderRadius: "10px",
-      overflow: "hidden",
-      position: "relative",
-    }}
-  >
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                right: "12px",
+                color: "#22c55e",
+                fontWeight: "600",
+                fontSize: "13px",
+                background: "rgba(0,0,0,0.5)",
+                padding: "5px 10px",
+                borderRadius: "6px",
+                textShadow: "0 0 6px rgba(34,197,94,0.7)",
+              }}
+            >
               🔴 Cam 1
             </div>
 
@@ -138,6 +142,7 @@ export default function Home() {
     width: "100%",
     height: "100%",
     border: "none",
+    objectFit: "cover",
   }}
   allow="autoplay; camera; microphone"
 />
