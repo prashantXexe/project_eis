@@ -115,21 +115,16 @@ export default function Home() {
     height: "100%",
     overflow: "hidden",
     position: "relative",
-    background: "#000",
-    borderRadius: "10px",
   }}
 >
   <iframe
     src={STREAM_URL}
     style={{
-      width: "150%",
-      height: "150%",
+      width: "170%",          // 👈 zoom out trick
+      height: "170%",
       border: "none",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(0.75)",
-      transformOrigin: "center",
+      transform: "scale(0.7)", // 👈 actual scaling
+      transformOrigin: "top left",
     }}
     allow="autoplay; camera; microphone"
   />
