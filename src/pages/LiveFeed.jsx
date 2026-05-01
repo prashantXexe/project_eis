@@ -43,8 +43,9 @@ export default function LivePage() {
     src={url}
     style={{
       width: "200%",          // 
-      height: "180%",
-      border: "none",// 
+      height: "150%",
+      border: "none",
+      transform: "scale(0.9)", // 
       transformOrigin: "top left",
     }}
     allow="autoplay; camera; microphone"
