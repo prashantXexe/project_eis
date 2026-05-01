@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "https://imported-validity-vegetation-contests.trycloudflare.com/video";
+    "http://10.51.16.148:8080/";
 
   return (
     <div

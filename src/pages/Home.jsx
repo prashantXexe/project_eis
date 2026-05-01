@@ -14,7 +14,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "https://imported-validity-vegetation-contests.trycloudflare.com/video";
+    "http://10.51.16.148:8080/";
 
   // 🔥 REALTIME DATA (DETECTIONS)
   useEffect(() => {
