@@ -138,31 +138,20 @@ export default function Home() {
               🔴 Cam 1
             </div>
 
-    <div
+    <iframe
+  src={STREAM_URL}
   style={{
     width: "100%",
     height: "100%",
-    overflow: "hidden",
-    position: "relative",
-    background: "#000",
-    borderRadius: "10px",
+    border: "none",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%) scale(1.6)",
+    transformOrigin: "center",
   }}
->
-  <iframe
-    src={STREAM_URL}
-    style={{
-      width: "100%",
-      height: "100%",
-      border: "none",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1.6)",
-      transformOrigin: "center",
-    }}
-    allow="autoplay; camera; microphone"
-  />
-</div>
+  allow="autoplay; camera; microphone"
+/>
           </div>
         </div>
 
