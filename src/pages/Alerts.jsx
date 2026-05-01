@@ -41,18 +41,20 @@ export default function Alerts() {
 
     return () => unsub();
   }, []);
-  const handleRemove = (id) => {
-  setHiddenAlerts(prev => [...prev, id]);
-};
 
-  // 🔥 LAST 24 HOURS FILTER
+  // ❌ REMOVE ALERT UI
+  const handleRemove = (id) => {
+    setHiddenAlerts(prev => [...prev, id]);
+  };
+
+  // 🔥 FILTER
   const now = new Date();
   const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const last24Alerts = alerts.filter(a => a.timestamp >= last24);
   const visibleAlerts = alerts.filter(a => !hiddenAlerts.includes(a.id));
 
-  // 🔢 STATS (LAST 24 HOURS)
+  // 🔢 STATS
   const totalCount = last24Alerts.length;
   const intrusionCount = last24Alerts.filter(a => a.type === "intrusion").length;
   const dwellCount = last24Alerts.filter(a => a.type === "dwell").length;
@@ -60,12 +62,12 @@ export default function Alerts() {
 
   return (
     <div style={{
-  padding: 20,
-  background: "linear-gradient(135deg, #0b1220, #1e3a8a)",
-  minHeight: "100vh"
-}}>
+      padding: 20,
+      background: "linear-gradient(135deg, #0b1220, #1e3a8a)",
+      minHeight: "100vh"
+    }}>
 
-      {/* 🔥 TOP STATS */}
+      {/* STATS */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -78,30 +80,21 @@ export default function Alerts() {
         <StatBox title="Loitering" value={loiterCount} />
       </div>
 
-      {/* 🔥 TABLE */}
+      {/* TABLE */}
       <div className="logWrapper" style={{
-  background: "rgba(15, 23, 42, 0.8)",
-  border: "1px solid rgba(59,130,246,0.3)",
-  backdropFilter: "blur(10px)"
-}}>
+        background: "rgba(15, 23, 42, 0.8)",
+        border: "1px solid rgba(59,130,246,0.3)",
+        backdropFilter: "blur(10px)"
+      }}>
         <table className="logTable" style={{ color: "#e5e7eb" }}>
-          <thead>
-            <tr
-  key={a.id}
-  style={{
-    transition: "0.2s"
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = "rgba(59,130,246,0.15)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = "transparent";
-  }}
->
-              <thead style={{
-  background: "rgba(30, 58, 138, 0.4)",
-  color: "#93c5fd"
-}}>
+
+          {/* ✅ FIXED HEADER */}
+          <thead style={{
+            background: "rgba(30, 58, 138, 0.4)",
+            color: "#93c5fd"
+          }}>
+            <tr>
+              <th>Track</th>
               <th>Type</th>
               <th>Zone</th>
               <th>Date</th>
@@ -109,43 +102,57 @@ export default function Alerts() {
             </tr>
           </thead>
 
+          {/* BODY */}
           <tbody>
             {visibleAlerts.map((a) => (
-              <tr key={a.id}>
+              <tr
+                key={a.id}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(59,130,246,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+
+                {/* TRACK + ❌ */}
                 <td style={{ position: "relative" }}>
-  {a.trackId}
+                  {a.trackId}
 
-  <span
-    onClick={() => handleRemove(a.id)}
-    style={{
-      position: "absolute",
-      top: "-5px",
-      right: "-5px",
-      cursor: "pointer",
-      color: "#ef4444",
-      fontSize: "14px",
-      fontWeight: "bold"
-    }}
-  >
-    ✖
-  </span>
-</td>
+                  <span
+                    onClick={() => handleRemove(a.id)}
+                    style={{
+                      position: "absolute",
+                      top: "-5px",
+                      right: "-5px",
+                      cursor: "pointer",
+                      color: "#ef4444",
+                      fontSize: "14px",
+                      fontWeight: "bold"
+                    }}
+                  >
+                    ✖
+                  </span>
+                </td>
 
+                {/* TYPE */}
                 <td style={{
-  color:
-    a.type === "intrusion" ? "#f87171" :
-    a.type === "dwell" ? "#fbbf24" :
-    "#34d399"
-}}>
+                  color:
+                    a.type === "intrusion" ? "#f87171" :
+                    a.type === "dwell" ? "#fbbf24" :
+                    "#34d399"
+                }}>
                   {a.type}
                 </td>
 
                 <td>{a.zone}</td>
                 <td>{a.date}</td>
                 <td>{a.time}</td>
+
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
 
@@ -153,9 +160,8 @@ export default function Alerts() {
   );
 }
 
-// 🔲 STAT BOX
+// STAT BOX
 function StatBox({ title, value }) {
-  // 🎨 dynamic color based on title
   let bg = "#0b1220";
   let border = "#1f2937";
 
