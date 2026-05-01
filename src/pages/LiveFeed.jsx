@@ -1,7 +1,7 @@
 export default function LivePage() {
   // 🔥 DIRECT URL (NO ENV)
   const url =
-    "http://10.51.16.148:8080/";
+    "http://10.201.167.148:8080/";
 
   return (
     <div
@@ -12,10 +12,10 @@ export default function LivePage() {
         justifyContent: "center",
         alignItems: "center",
         gap: "15px",
-        background: "#020617"   // 🔥 dark bg (pro look)
+        background: "#020617"   
       }}
     >
-      {/* 🔥 TITLE */}
+      {/*  TITLE */}
       <h2
         style={{
           color: "#22c55e",
@@ -27,7 +27,7 @@ export default function LivePage() {
         🔴 Cam 1 Live Feed
       </h2>
 
-      {/* 🔥 VIDEO */}
+      {/*  VIDEO */}
       <div
         style={{
           width: "700px",
@@ -39,15 +39,17 @@ export default function LivePage() {
           boxShadow: "0 0 25px rgba(0,0,0,0.7)"
         }}
       >
-        <img
-          src={url}
-          alt="Live"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain"
-          }}
-        />
+        <iframe
+    src={url}
+    style={{
+      width: "120%",          // 
+      height: "150%",
+      border: "none",
+      transform: "scale(0.9)", // 
+      transformOrigin: "top left",
+    }}
+    allow="autoplay; camera; microphone"
+  />
       </div>
     </div>
   );
