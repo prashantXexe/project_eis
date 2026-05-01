@@ -113,12 +113,27 @@ export default function Home() {
   style={{
     width: "100%",
     height: "100%",
+    overflow: "hidden",
+    position: "relative",
     background: "#000",
     borderRadius: "10px",
-    overflow: "hidden",   // 🔥 scroll remove
-    position: "relative",
   }}
 >
+  <iframe
+    src={STREAM_URL}
+    style={{
+      width: "150%",
+      height: "150%",
+      border: "none",
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(0.75)",
+      transformOrigin: "center",
+    }}
+    allow="autoplay; camera; microphone"
+  />
+</div>
             <div
               style={{
                 position: "absolute",
@@ -136,30 +151,16 @@ export default function Home() {
               🔴 Cam 1
             </div>
 
-    <div
+    <iframe
+  src={STREAM_URL}
   style={{
     width: "100%",
     height: "100%",
-    overflow: "hidden",
-    position: "relative",
-    background: "#000",
+    border: "none",
+    objectFit: "cover",
   }}
->
-  <iframe
-    src={STREAM_URL}
-    style={{
-      width: "140%",
-      height: "140%",
-      border: "none",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%) scale(1.2)",
-      transformOrigin: "center",
-    }}
-    allow="autoplay; camera; microphone"
-  />
-</div>
+  allow="autoplay; camera; microphone"
+/>
           </div>
         </div>
 
