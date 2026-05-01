@@ -149,10 +149,10 @@ export default function Home() {
   <iframe
     src={STREAM_URL}
     style={{
-      width: "140%",          // 👈 zoom out trick
-      height: "170%",
+      width: "130%",          // 👈 zoom out trick
+      height: "160%",
       border: "none",
-      transform: "scale(0.6)", // 👈 actual scaling
+      transform: "scale(0.7)", // 👈 actual scaling
       transformOrigin: "top left",
     }}
     allow="autoplay; camera; microphone"
