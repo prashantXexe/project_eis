@@ -104,7 +104,7 @@ export default function Home() {
         <div
           className="card"
           onClick={(e) => {
-            if (e.target.tagName !== "IMG") {
+            if (e.target.tagName !== "IFRAME") {
               nav("/live");
             }
           }}
@@ -138,15 +138,15 @@ export default function Home() {
               🔴 Cam 1
             </div>
 
-            <img
-              src={STREAM_URL}
-              alt="Live"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
+            <iframe
+  src={STREAM_URL}
+  style={{
+    width: "100%",
+    height: "100%",
+    border: "none",
+  }}
+  allow="autoplay; camera; microphone"
+/>
           </div>
         </div>
 
