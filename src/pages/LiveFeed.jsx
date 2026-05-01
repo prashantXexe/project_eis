@@ -42,10 +42,10 @@ export default function LivePage() {
         <iframe
     src={url}
     style={{
-      width: "120%",          // 
-      height: "150%",
+      width: "100%",          // 
+      height: "100%",
       border: "none",
-      transform: "scale(0.9)", // 
+      transform: "scale(0.5)", // 
       transformOrigin: "top left",
     }}
     allow="autoplay; camera; microphone"
