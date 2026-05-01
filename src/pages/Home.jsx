@@ -14,7 +14,7 @@ export default function Home() {
 
   // 🔥 DIRECT STREAM URL (NO ENV)
   const STREAM_URL =
-    "http://10.51.16.148:8080/";
+    "http://10.201.167.148:8080/";
 
   // 🔥 REALTIME DATA (DETECTIONS)
   useEffect(() => {
