@@ -42,8 +42,8 @@ export default function LivePage() {
         <iframe
     src={url}
     style={{
-      width: "300%",          // 
-      height: "300%",
+      width: "50%",          // 
+      height: "50%",
       border: "none",
       transform: "scale(0.2)", // 
       transformOrigin: "top left",
