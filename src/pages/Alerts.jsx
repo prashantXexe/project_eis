@@ -9,6 +9,7 @@ import {
 
 export default function Alerts() {
   const [alerts, setAlerts] = useState([]);
+  const [hiddenAlerts, setHiddenAlerts] = useState([]);
 
   useEffect(() => {
     const q = query(
@@ -40,12 +41,16 @@ export default function Alerts() {
 
     return () => unsub();
   }, []);
+  const handleRemove = (id) => {
+  setHiddenAlerts(prev => [...prev, id]);
+};
 
   // 🔥 LAST 24 HOURS FILTER
   const now = new Date();
   const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const last24Alerts = alerts.filter(a => a.timestamp >= last24);
+  const visibleAlerts = alerts.filter(a => !hiddenAlerts.includes(a.id));
 
   // 🔢 STATS (LAST 24 HOURS)
   const totalCount = last24Alerts.length;
@@ -54,7 +59,11 @@ export default function Alerts() {
   const loiterCount = last24Alerts.filter(a => a.type === "loitering").length;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{
+  padding: 20,
+  background: "linear-gradient(135deg, #0b1220, #1e3a8a)",
+  minHeight: "100vh"
+}}>
 
       {/* 🔥 TOP STATS */}
       <div style={{
@@ -70,11 +79,29 @@ export default function Alerts() {
       </div>
 
       {/* 🔥 TABLE */}
-      <div className="logWrapper">
-        <table className="logTable">
+      <div className="logWrapper" style={{
+  background: "rgba(15, 23, 42, 0.8)",
+  border: "1px solid rgba(59,130,246,0.3)",
+  backdropFilter: "blur(10px)"
+}}>
+        <table className="logTable" style={{ color: "#e5e7eb" }}>
           <thead>
-            <tr>
-              <th>Track</th>
+            <tr
+  key={a.id}
+  style={{
+    transition: "0.2s"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = "rgba(59,130,246,0.15)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = "transparent";
+  }}
+>
+              <thead style={{
+  background: "rgba(30, 58, 138, 0.4)",
+  color: "#93c5fd"
+}}>
               <th>Type</th>
               <th>Zone</th>
               <th>Date</th>
@@ -83,16 +110,33 @@ export default function Alerts() {
           </thead>
 
           <tbody>
-            {alerts.map((a) => (
+            {visibleAlerts.map((a) => (
               <tr key={a.id}>
-                <td>{a.trackId}</td>
+                <td style={{ position: "relative" }}>
+  {a.trackId}
+
+  <span
+    onClick={() => handleRemove(a.id)}
+    style={{
+      position: "absolute",
+      top: "-5px",
+      right: "-5px",
+      cursor: "pointer",
+      color: "#ef4444",
+      fontSize: "14px",
+      fontWeight: "bold"
+    }}
+  >
+    ✖
+  </span>
+</td>
 
                 <td style={{
-                  color:
-                    a.type === "intrusion" ? "#ef4444" :
-                    a.type === "dwell" ? "#f59e0b" :
-                    "#22c55e"
-                }}>
+  color:
+    a.type === "intrusion" ? "#f87171" :
+    a.type === "dwell" ? "#fbbf24" :
+    "#34d399"
+}}>
                   {a.type}
                 </td>
 
@@ -147,7 +191,7 @@ function StatBox({ title, value }) {
         transition: "0.3s",
       }}
     >
-      <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+      <div style={{ color: "#cbd5f5", fontSize: "14px" }}>
         {title}
       </div>
 
